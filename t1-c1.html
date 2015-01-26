@@ -25,7 +25,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>クラウドインテグレーション体験ラウンジ</title>
+    <title>仮想サーバーを1台起動してみる</title>
     <!-- Styles -->
     
     <link rel="stylesheet" media="print" href="theme/css/print.css">
@@ -48,21 +48,13 @@
     </div>
     <div class="slides">
       
-      <!-- slide source: index.rst -->
+      <!-- slide source: t1-c1.rst -->
       <div class="slide-wrapper">
         <div class="slide">
           <div class="inner">
             
-            <header><h1>クラウドインテグレーション体験ラウンジ</h1></header>
+            <header><h1>仮想サーバーを1台起動してみる</h1></header>
             
-            
-            <section><ul class="simple">
-<li>ようこそ「クラウドインテグレーション体験ラウンジ」へ！</li>
-<li>このラウンジではOpenStack上にシステムをインテグレーションするための技術について、考え方と具体的な操作方法と合わせて体験できます。</li>
-<li>本ラウンジは、セルフサービス型のハンズオン形式になっています。</li>
-<li>続くページのリンクから、体験してみたいテーマを選択してください！</li>
-<li>最後にアンケートがありますので、体験後に是非回答をお願いします。次回以降の参考とさせていただきます。</li>
-</ul></section>
             
           </div>
           <div class="presenter_notes">
@@ -74,68 +66,29 @@
           <footer>
             
             <aside class="source">
-              Source: <a href="index.rst">index.rst</a>
+              Source: <a href="t1-c1.rst">t1-c1.rst</a>
             </aside>
             
             <aside class="page_number">
-              1/4
+              1/5
             </aside>
           </footer>
         </div>
       </div>
       
-      <!-- slide source: index.rst -->
+      <!-- slide source: t1-c1.rst -->
       <div class="slide-wrapper">
         <div class="slide">
           <div class="inner">
             
-            <header><h1>注意事項</h1></header>
+            <header><h1>概要</h1></header>
             
             
             <section><ul class="simple">
-<li>混雑時に本環境を長時間占有するのはご遠慮ください。</li>
-<li>本環境でプライベートなインターネットアクセスはご遠慮ください。</li>
-<li>本環境は、OpenStack Days 2015 開催日のみアクセス可能な環境になります。</li>
-</ul></section>
-            
-          </div>
-          <div class="presenter_notes">
-            <header><h1>Presenter Notes</h1></header>
-            <section>
-            
-            </section>
-          </div>
-          <footer>
-            
-            <aside class="source">
-              Source: <a href="index.rst">index.rst</a>
-            </aside>
-            
-            <aside class="page_number">
-              2/4
-            </aside>
-          </footer>
-        </div>
-      </div>
-      
-      <!-- slide source: index.rst -->
-      <div class="slide-wrapper">
-        <div class="slide">
-          <div class="inner">
-            
-            <header><h1>テーマ</h1></header>
-            
-            
-            <section><ul class="simple">
-<li><a class="reference external" href="./index01.html">1. 基礎操作編</a></li>
-<li><a class="reference external" href="./index02.html">2. クラウド上の自動化</a></li>
-<li><a class="reference external" href="./index03.html">3. クラウド上のデータ保護</a></li>
-<li><a class="reference external" href="./index04.html">4. システムデザイン</a></li>
-<li><a class="reference external" href="./about_env.html">OpenStack環境について</a></li>
-<li><a class="reference external" href="./xxxxxxxx">アンケート</a></li>
-<li>ヘルプ<ul>
-<li>「t」「h」キーで、スライドの目次、操作方法を表示できます。</li>
-<li>操作方法でわからないことがあれば、お近くのスタッフまでお声がけください。</li>
+<li>ここではOpenStack上に仮想サーバーを１台起動してみます。</li>
+<li>２通りの方法でサーバーを起動します。<ul>
+<li>Horizon（Webのダッシュボード）を利用したサーバーの起動</li>
+<li>CLI（コマンドライン）を利用したサーバーの起動</li>
 </ul>
 </li>
 </ul></section>
@@ -150,30 +103,23 @@
           <footer>
             
             <aside class="source">
-              Source: <a href="index.rst">index.rst</a>
+              Source: <a href="t1-c1.rst">t1-c1.rst</a>
             </aside>
             
             <aside class="page_number">
-              3/4
+              2/5
             </aside>
           </footer>
         </div>
       </div>
       
-      <!-- slide source: index.rst -->
+      <!-- slide source: t1-c1.rst -->
       <div class="slide-wrapper">
         <div class="slide">
           <div class="inner">
             
-            <header><h1>本演習について</h1></header>
+            <header><h1>Horizonを使ったサーバーの起動</h1></header>
             
-            
-            <section><img alt="_assets/index/00-00.png" class="align-right" src="_assets/index/00-00.png" style="width: 30%;" />
-<ul class="simple">
-<li>本演習は、翔泳社「OpenStackクラウドインテグレーション オープンソースクラウドによるサービス構築入門」から抜粋しております。</li>
-<li>体験した内容をより深く学習したい方は、こちらをご参照ください。</li>
-<li><a class="reference external" href="http://www.amazon.co.jp/dp/4798139785">http://www.amazon.co.jp/dp/4798139785</a></li>
-</ul></section>
             
           </div>
           <div class="presenter_notes">
@@ -185,11 +131,107 @@
           <footer>
             
             <aside class="source">
-              Source: <a href="index.rst">index.rst</a>
+              Source: <a href="t1-c1.rst">t1-c1.rst</a>
             </aside>
             
             <aside class="page_number">
-              4/4
+              3/5
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t1-c1.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>事前準備</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>事前準備として以下のスクリプトを実行してください。</li>
+</ul>
+<p>準備スクリプトの実行:</p>
+<pre class="literal-block">
+---------ここから---------
+cd $HOME
+sh support/t1-c1/01_init.sh
+---------ここまで---------
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t1-c1.rst">t1-c1.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              4/5
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t1-c1.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>状態の確認</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>まず、Horizonへログインし、現在の状況を確認します。</li>
+<li><a class="reference external" href="http://www.rdcloud.bi-rd.net/auth/login/">http://www.rdcloud.bi-rd.net/auth/login/</a></li>
+<li>ログインIDの確認方法は次ページ参照</li>
+</ul>
+<img alt="./_assets/c1-t1/01_login.png" src="./_assets/c1-t1/01_login.png" style="width: 40%;" /></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t1-c1.rst">t1-c1.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              5/5
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source:  -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="page_number">
+              /5
             </aside>
           </footer>
         </div>
@@ -204,26 +246,32 @@
       <caption>Table of Contents</caption>
       
       <tr id="toc-row-1">
-        <th><a href="#slide1">クラウドインテグレーション体験ラウンジ</a></th>
+        <th><a href="#slide1">仮想サーバーを1台起動してみる</a></th>
         <td><a href="#slide1">1</a></td>
       </tr>
       
       
       <tr id="toc-row-2">
-        <th><a href="#slide2">注意事項</a></th>
+        <th><a href="#slide2">概要</a></th>
         <td><a href="#slide2">2</a></td>
       </tr>
       
       
       <tr id="toc-row-3">
-        <th><a href="#slide3">テーマ</a></th>
+        <th><a href="#slide3">Horizonを使ったサーバーの起動</a></th>
         <td><a href="#slide3">3</a></td>
       </tr>
       
       
       <tr id="toc-row-4">
-        <th><a href="#slide4">本演習について</a></th>
+        <th><a href="#slide4">事前準備</a></th>
         <td><a href="#slide4">4</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-5">
+        <th><a href="#slide5">状態の確認</a></th>
+        <td><a href="#slide5">5</a></td>
       </tr>
       
       
