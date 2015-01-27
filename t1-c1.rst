@@ -40,7 +40,7 @@ Horizonを使ったサーバーの起動
 - http://www.rdcloud.bi-rd.net/auth/login/
 - ログインIDの確認方法は次ページ参照
 
-.. image:: ./blob/master//_assets/c1-t1/01_login.png
+.. image:: ./_assets/c1-t1/01_login.png
    :width: 40%
 
 ----

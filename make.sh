@@ -9,5 +9,5 @@ fi
 for inputfile in `ls *.rst`
 do
    outputfile=`basename ${inputfile} .rst`
-   landslide -r -d ${outputfile}.html ${inputfile}
+   landslide -r -i -d ${outputfile}.html ${inputfile}
 done
