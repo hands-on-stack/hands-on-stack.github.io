@@ -160,7 +160,7 @@ userdataによるアプリの自動配布(4)
 
   - 「OpenStackクラウドインテグレーション」より引用
 
-.. image:: ./_assets/c4-t1/01_singlevm.png
+.. image:: ./_assets/t4-c1/01_singlevm.png
      :width: 70%
 
 ----
@@ -287,7 +287,7 @@ Ansibleによるアプリの自動配布(4)
 
   - 「OpenStackクラウドインテグレーション」より引用
 
-.. image:: ./_assets/c4-t1/02_multivm.png
+.. image:: ./_assets/t4-c1/02_multivm.png
      :width: 70%
 
 ----
