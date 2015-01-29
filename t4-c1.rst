@@ -34,7 +34,7 @@ DockerとOpenStack
 コマンド実行の様子::
 
   ---------ここから---------
-  $ cd /opt/support/t4-c1
+  $ cd /opt/support/t4-c1  # <--- ディレクトリー「/opst/support/t4-c1」を使用します。
   $ ./01_init.sh
   Cleaning up...
   Booting student01-step-server...
@@ -52,7 +52,7 @@ DockerとOpenStack
 操作用仮想マシンへのログイン
 ================
 
-- 最後に表示されたsshコマンドで操作用仮想マシンにログインします。
+- 最後に表示されたsshコマンドで、操作用仮想マシンにログインします。
 
 コマンド実行の様子::
 
@@ -92,9 +92,9 @@ userdataによるアプリの自動配布(2)
 
 - 下記のコマンドを実行して、先ほどのスクリプトをuserdataに指定して仮想マシンを起動します。
 
-  - $STUDENT には利用端末に応じた値が自動設定されています。下記の例の通りにコマンドを入力します。
+  - $STUDENT には利用端末に応じた値が自動設定されています。下記の通りにコマンドを入力します。
 
-  - ここで指定するテンプレートイメージ "docker-base" には、事前にDockerが導入されています。
+  - ここで使用するテンプレートイメージ "docker-base" には、事前にDockerが導入されています。
 
 
 コマンド実行::
@@ -117,11 +117,12 @@ userdataによるアプリの自動配布(3)
 
 - 下記のコマンドを実行すると、起動中の仮想マシンのコンソールログ（末尾の10行）が10秒ごとに表示されます。
 
-  - タイミングにより "ERROR: The resource could not be found." と表示されますがこれは問題ありません。
+  - タイミングにより "ERROR: The resource could not be found." と表示されますが、これは問題ありません。
+
+  - ゲストOSの起動中に、userdataからアプリケーションの配布が実施されますので、起動完了までは少し時間がかかります。
 
   - ゲストOSの起動が完了して、コンソールログにログインプロンプトが表示されるまで待ちます。
 
-  - ゲストOSの起動中にuserdataから、アプリケーションの配布が実施されますので、起動完了までは少し時間がかかります。
 
 コマンド実行::
 
@@ -201,7 +202,7 @@ Ansibleによるアプリの自動配布(1)
 
 - 演習環境では、リソース不足で仮想マシン起動時にタイムアウトエラーになることがあります。その際は、下記のコマンドで "ACTIVE" でない仮想マシンを削除して、再度、ansible-playbookコマンドを実行してください。
 
-コマンド実行の例::
+ACTIVEでない仮想マシンを削除する例::
 
   ---------ここから---------
   $ nova list --field name,status | grep -E "$STUDENT-(web|app|dbs)"
@@ -305,6 +306,8 @@ Ansibleによるアプリの自動配布(4)
   (venv)[ansible@student01-step-server ~]$ exit
   logout
   Connection to 15.126.249.225 closed.
+  $ pwd       
+  /opt/support/t4-c1  # <---「/opt/support/t4-c1」にいることを確認します。
   $ ./99_cleanup.sh
   Deleting student01-app-ef5527ee-ae89-4984-aa90-f78d21b92eda
   Deleting student01-dbs-5c6b09bf-c9e5-41f3-accc-426b507c1cb8
