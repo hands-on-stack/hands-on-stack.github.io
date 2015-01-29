@@ -34,7 +34,7 @@ DockerとOpenStack
 コマンド実行の様子::
 
   ---------ここから---------
-  $ cd /opt/support/t4-c1  # <--- ディレクトリー「/opst/support/t4-c1」を使用します。
+  $ cd /opt/support/t4-c1  # <--- ディレクトリー「/opt/support/t4-c1」を使用します。
   $ ./01_init.sh
   Cleaning up...
   Booting student01-step-server...
