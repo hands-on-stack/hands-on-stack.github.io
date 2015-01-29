@@ -75,7 +75,7 @@ userdataによるアプリの自動配布(1)
 スクリプトの内容::
 
   ---------ここから---------
-  $ cat userdata_docker-all.txt 
+  $ cat $HOME/userdata_docker-all.txt 
   #!/bin/bash
   service docker start
   docker run -itd --name dbs enakai00/dbs:ver1.0
