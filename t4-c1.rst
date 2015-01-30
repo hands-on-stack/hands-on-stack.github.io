@@ -188,7 +188,7 @@ userdataによるアプリの自動配布(4)
   21d4bf1976cc        enakai00/web:ver1.0   "/usr/local/bin/init   31 minutes ago      Up 31 minutes       0.0.0.0:80->80/tcp   web                 
   f070bf98988a        enakai00/app:ver1.0   "/usr/local/bin/init   32 minutes ago      Up 32 minutes       5555/tcp             app                 
   84a883992849        enakai00/dbs:ver1.0   "/usr/local/bin/init   34 minutes ago      Up 34 minutes       3306/tcp             dbs                 
-  [root@student01-docker-all ~]# logout
+  [root@student01-docker-all ~]# exit
   ---------ここまで---------
 
 
