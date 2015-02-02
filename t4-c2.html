@@ -70,7 +70,7 @@
             </aside>
             
             <aside class="page_number">
-              1/9
+              1/11
             </aside>
           </footer>
         </div>
@@ -87,11 +87,11 @@
             <section><ul class="simple">
 <li>ここではFogを用いて仮想マシンを複数台作成し、役割に応じてChefでデプロイを行います。</li>
 <li>作成されるサーバは以下の通りです。studentXXの部分には、操作端末の番号が割り当てられます。<ul>
-<li>studentXXlb1 : 掲示板アプリのロードバランササーバー1</li>
-<li>studentXXweb1 : 掲示板アプリのフロントWebサーバー1</li>
-<li>studentXXweb2 : 掲示板アプリのフロントWebサーバー2</li>
-<li>studentXXapp1 : 掲示板アプリのアプリサーバー</li>
-<li>studentXXdb1 : 掲示板アプリのデータベースサーバー</li>
+<li>studentXXlb1 : ロードバランササーバー1</li>
+<li>studentXXweb1 : フロントWebサーバー1</li>
+<li>studentXXweb2 : フロントWebサーバー2</li>
+<li>studentXXapp1 : アプリサーバー</li>
+<li>studentXXdb1 : データベースサーバー</li>
 </ul>
 </li>
 </ul></section>
@@ -110,7 +110,7 @@
             </aside>
             
             <aside class="page_number">
-              2/9
+              2/11
             </aside>
           </footer>
         </div>
@@ -125,8 +125,9 @@
             
             
             <section><ul class="simple">
-<li>下記のコマンドで、Fogが導入された操作用仮想マシンを用意します。<ul>
+<li>下記のコマンドで、Fogが導入されたサーバーを用意します。<ul>
 <li>コマンドの実行が完了するまで数分かかります。</li>
+<li>コマンドが終了すると、Fogサーバーへのログインコマンドが表示されます。</li>
 </ul>
 </li>
 </ul>
@@ -136,7 +137,6 @@
 $ cd /opt/support/t4-c2
 $ ./01_init.sh
 (中略)
-
 ####init.sh finished. Please login to fog-server by following command
 ssh -i ~/default.pem -oStrictHostKeyChecking=no fog&#64;IPアドレス
 ---------ここまで---------
@@ -156,7 +156,7 @@ ssh -i ~/default.pem -oStrictHostKeyChecking=no fog&#64;IPアドレス
             </aside>
             
             <aside class="page_number">
-              3/9
+              3/11
             </aside>
           </footer>
         </div>
@@ -167,11 +167,11 @@ ssh -i ~/default.pem -oStrictHostKeyChecking=no fog&#64;IPアドレス
         <div class="slide">
           <div class="inner">
             
-            <header><h1>操作用仮想マシンへのログイン</h1></header>
+            <header><h1>Fogサーバーへのログイン</h1></header>
             
             
             <section><ul class="simple">
-<li>最後に表示されたsshコマンドで、操作用仮想マシンにログインします。</li>
+<li>最後に表示されたコマンドで、Fogサーバーにログインします。</li>
 </ul>
 <p>コマンド実行:</p>
 <pre class="literal-block">
@@ -194,7 +194,7 @@ $ ssh -i ~/default.pem -oStrictHostKeyChecking=no fog&#64;IPアドレス
             </aside>
             
             <aside class="page_number">
-              4/9
+              4/11
             </aside>
           </footer>
         </div>
@@ -205,16 +205,22 @@ $ ssh -i ~/default.pem -oStrictHostKeyChecking=no fog&#64;IPアドレス
         <div class="slide">
           <div class="inner">
             
-            <header><h1>仮想マシンの作成とアプリケーションデプロイの実行(1)</h1></header>
+            <header><h1>仮想マシン作成とアプリデプロイ(1)</h1></header>
             
             
             <section><ul class="simple">
-<li>Fogが導入された仮想マシンを起動して下記のスクリプトを実行すると、仮想マシンが作成されます。その後、各サーバーにアプリケーションに必要な機能がデプロイされ、掲示板アプリが利用可能になります。</li>
+<li>Fogサーバー上で下記のスクリプトを実行すると、以下のような流れで処理が進みます。<ul>
+<li>サーバ設定(yaml形式)を作成します。$HOMEにyamlが残るので、後で内容確認できます。</li>
+<li>yamlに沿って仮想マシンを作成します。1台完了すると『Create server studentXXdb1』と表示されます。</li>
+</ul>
+</li>
 </ul>
 <p>コマンド実行:</p>
 <pre class="literal-block">
 ---------ここから---------
 $ ~/deploy_app.sh
+Created server student18db1
+(中略)
 ---------ここまで---------
 </pre></section>
             
@@ -232,7 +238,7 @@ $ ~/deploy_app.sh
             </aside>
             
             <aside class="page_number">
-              5/9
+              5/11
             </aside>
           </footer>
         </div>
@@ -243,37 +249,109 @@ $ ~/deploy_app.sh
         <div class="slide">
           <div class="inner">
             
-            <header><h1>仮想マシンの作成とアプリケーションデプロイの実行(2)</h1></header>
+            <header><h1>仮想マシン作成とアプリデプロイ(2)</h1></header>
             
             
-            <section><ul>
-<li><p class="first">コマンドを実行すると、以下のような流れで処理が進みます</p>
-<p>-サーバを作成するのに必要なデータは、yamlファイルで管理されます。そのため、 本デモではコマンド実行時にまずyamlファイルを作成します。作成されたyamlファイルは、$HOMEディレクトリにありますので、アプリケーションデプロイ後、確認することもできます。</p>
-<ul class="simple">
-<li>yamlで定義された役割に応じて仮想マシンを作成します。完了すると『Create server studentXXdb1』と表示されます。</li>
+            <section><ul class="simple">
+<li>続き<ul>
 <li>作成したサーバーとicmpでの疎通ができるまで一定間隔でポーリングを繰り返します。疎通が取れると、『I found icmp session to student18db1』と表示され先に進みます。</li>
-<li>作成した全てのサーバとの疎通が確認できた時点で、Chefによるデプロイが開始されます。Chefサーバに必要なcookbookとroleがアップロードされ、デプロイを実行します。</li>
-<li>デプロイが完了すると、実行ログのパスが表示されます。全てのサーバに対してデプロイが完了すると、処理を終了します。</li>
-<li>また、最後にアプリケーションにアクセスするためのURLが表示されます。studentXXlb1サーバのローカルIPアドレスは、nova listコマンドで確認ください。</li>
 </ul>
 </li>
 </ul>
-<p>ログ:</p>
+<p>コマンド実行:</p>
 <pre class="literal-block">
 ---------ここから---------
 Created server student18db1
 (中略)
 waiting icmp session to student18db1
 I found icmp session to student18db1
-(中略)
+---------ここまで---------
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t4-c2.rst">t4-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              6/11
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t4-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>仮想マシン作成とアプリデプロイ(3)</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>続き<ul>
+<li>全サーバと疎通確認後、Chefサーバにcookbookとroleがアップロードされ、デプロイが始まります。</li>
+<li>一デプロイが完了ごとに、ログが表示されます。全デプロイが完了で処理は終了です。</li>
+</ul>
+</li>
+</ul>
+<p>コマンド実行:</p>
+<pre class="literal-block">
+---------ここから---------
 cookbooks uploaded.
 roles uploaded.
 (中略)
 deploy finished =&gt; student18db1
 check logfile =&gt; more /tmp/student18db1_bootstrap.log
-deploy finished =&gt; student18web1
-check logfile =&gt; more /tmp/student18web1_bootstrap.log
-(中略)
+---------ここまで---------
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t4-c2.rst">t4-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              7/11
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t4-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>仮想マシン作成とアプリデプロイ(4)</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>続き<ul>
+<li>最後にアプリURL(studentXXlb1サーバ)が表示されます。ローカルIPアドレスは、nova listコマンドで確認ください。</li>
+<li>今回CUIのため、y3mでアプリにリクエストしてください。問題なければアプリが動作するはずです。</li>
+</ul>
+</li>
+</ul>
+<p>コマンド実行:</p>
+<pre class="literal-block">
+---------ここから---------
 Deploy finished. TRY w3m http://'local-ip-address-of-student18lb1' from this server
 ---------ここまで---------
 </pre></section>
@@ -292,7 +370,7 @@ Deploy finished. TRY w3m http://'local-ip-address-of-student18lb1' from this ser
             </aside>
             
             <aside class="page_number">
-              6/9
+              8/11
             </aside>
           </footer>
         </div>
@@ -307,7 +385,7 @@ Deploy finished. TRY w3m http://'local-ip-address-of-student18lb1' from this ser
             
             
             <section><ul class="simple">
-<li>今回、構築した環境は下図のようになります。<ul>
+<li>今回、構築した環境は下図のようになります。(Openstack側)<ul>
 <li>「OpenStackクラウドインテグレーション」より引用</li>
 </ul>
 </li>
@@ -328,7 +406,7 @@ Deploy finished. TRY w3m http://'local-ip-address-of-student18lb1' from this ser
             </aside>
             
             <aside class="page_number">
-              7/9
+              9/11
             </aside>
           </footer>
         </div>
@@ -343,8 +421,8 @@ Deploy finished. TRY w3m http://'local-ip-address-of-student18lb1' from this ser
             
             
             <section><ul class="simple">
-<li>起動した仮想マシンをすべて削除します。</li>
-<li>下記のように、操作用仮想マシンからログアウトして、仮想マシンを削除するスクリプトを実行します。</li>
+<li>デモが終了したら、起動した仮想マシンやネットワーク環境をすべて削除します。</li>
+<li>下記のように、Fogサーバからログアウトして、作業PCに戻ってから環境を削除するスクリプトを実行します。</li>
 </ul>
 <p>コマンド実行:</p>
 <pre class="literal-block">
@@ -368,7 +446,7 @@ $ /opt/support/t4-c2/99_cleanup.sh
             </aside>
             
             <aside class="page_number">
-              8/9
+              10/11
             </aside>
           </footer>
         </div>
@@ -401,7 +479,7 @@ $ /opt/support/t4-c2/99_cleanup.sh
             </aside>
             
             <aside class="page_number">
-              9/9
+              11/11
             </aside>
           </footer>
         </div>
@@ -434,38 +512,50 @@ $ /opt/support/t4-c2/99_cleanup.sh
       
       
       <tr id="toc-row-4">
-        <th><a href="#slide4">操作用仮想マシンへのログイン</a></th>
+        <th><a href="#slide4">Fogサーバーへのログイン</a></th>
         <td><a href="#slide4">4</a></td>
       </tr>
       
       
       <tr id="toc-row-5">
-        <th><a href="#slide5">仮想マシンの作成とアプリケーションデプロイの実行(1)</a></th>
+        <th><a href="#slide5">仮想マシン作成とアプリデプロイ(1)</a></th>
         <td><a href="#slide5">5</a></td>
       </tr>
       
       
       <tr id="toc-row-6">
-        <th><a href="#slide6">仮想マシンの作成とアプリケーションデプロイの実行(2)</a></th>
+        <th><a href="#slide6">仮想マシン作成とアプリデプロイ(2)</a></th>
         <td><a href="#slide6">6</a></td>
       </tr>
       
       
       <tr id="toc-row-7">
-        <th><a href="#slide7">構築した環境の全体像</a></th>
+        <th><a href="#slide7">仮想マシン作成とアプリデプロイ(3)</a></th>
         <td><a href="#slide7">7</a></td>
       </tr>
       
       
       <tr id="toc-row-8">
-        <th><a href="#slide8">環境の削除</a></th>
+        <th><a href="#slide8">仮想マシン作成とアプリデプロイ(4)</a></th>
         <td><a href="#slide8">8</a></td>
       </tr>
       
       
       <tr id="toc-row-9">
-        <th><a href="#slide9">まとめ</a></th>
+        <th><a href="#slide9">構築した環境の全体像</a></th>
         <td><a href="#slide9">9</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-10">
+        <th><a href="#slide10">環境の削除</a></th>
+        <td><a href="#slide10">10</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-11">
+        <th><a href="#slide11">まとめ</a></th>
+        <td><a href="#slide11">11</a></td>
       </tr>
       
       
