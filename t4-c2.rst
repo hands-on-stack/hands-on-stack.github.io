@@ -120,8 +120,10 @@ FogとChefを使ったアプリケーションデプロイ
 
 - 今回、構築した環境は下図のようになります。
 
-  - 「OpenStackクラウドインテグレーション」図 12-2-2 OpenStack/AWS への Write Once Deploy Anywhere より引用
+  - 「OpenStackクラウドインテグレーション」より引用
 
+.. image:: ./_assets/t4-c2/01_environment.png
+     :width: 70%
 
 ----
 
