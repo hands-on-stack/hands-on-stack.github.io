@@ -1,0 +1,391 @@
+3 階層ウェブシステムの自動構築
+==============================
+
+----
+
+
+概要
+================
+
+- ここでは、OpenStack 上への三階層ウェブシステムの自動構築を行います。
+- システムは DB サーバー、APP サーバー、WEB サーバー 1 台ずつで構成される簡単なものですが、
+  ``userdata`` と ``metadata`` というOpenStackにデータを渡す仕組みを活用して自動インストールと設定を行います。
+- 仮想マシン毎に違った起動処理を行う方法を学べます。
+
+(掲示板アプリケーションの全体構成図をここに入れる)
+
+----
+
+
+操作環境の準備
+================
+
+- 下記のコマンドで、演習環境の準備を行います。コマンドの実行が完了するまで数分かかります。
+- 3階層システムに必要な仮想ネットワーク、セキュリティーグループ、動作確認用サーバーなどを作成しています。
+- **サンプルファイルがホームディレクトリに用意されます。**
+
+コマンド実行::
+
+  $ /opt/support/t2-c1/1_init.sh
+          <--- ディレクトリー「/opt/support/t2-c1」を使用します。
+  ...（中略）... 
+  | ID                                   | Name        | Status | Task State | Power State | Networks                        |
+  +--------------------------------------+-------------+--------+------------+-------------+---------------------------------+
+  | b5440947-e245-4c7c-8d4f-301e5b75f34a | step-server | ACTIVE | -          | Running     | work-net=10.0.0.1, 118.67.96.82 |
+  +--------------------------------------+-------------+--------+------------+-------------+---------------------------------+
+  ============================================================
+  Initialization Completed!
+  ============================================================
+
+
+----
+
+userdata による自動インストール (1)
+===================================
+
+- 最初に DB サーバーを起動します。
+- OpenStack (Nova) には userdata という仕組みがあります。 userdata スクリプトを指定して VM を作成すると、 VM 起動時に自動的に実行されます。
+- ここでは、サンプルアプリケーションを git clone し、インストールを行うスクリプトを用意しています。
+
+スクリプトの内容::
+
+  $ cat userdata_dbs.txt 
+  #!/bin/bash
+  cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+  cd /root
+  git clone -q https://github.com/josug-book1-materials/sample-app.git
+  cd sample-app
+  git checkout -b v1.0 remotes/origin/v1.0
+  sh /root/sample-app/server-setup/install_db.sh
+  echo "### end userdata_dbs"
+
+----
+
+userdata による自動インストール (2)
+===================================
+
+- 下記のコマンドを実行し、先ほどのスクリプトを userdata に指定して
+  DB サーバーの仮想マシンを起動します。
+
+  - userdata スクリプトが実行され、自動的に DB サーバーのセットアップが行われます。
+    起動完了までは少し時間がかかります。
+  - get_net_id.sh は仮想ネットワークの ID を取得し変数に格納しています。
+
+コマンド実行::
+
+  $ source get_net_id.sh
+  $ nova boot --flavor standard.xsmall --image "centos-base" \
+      --key-name default --user-data userdata_dbs.txt \
+      --security-groups sg-all-from-console,sg-all-from-dbs-net \
+      --availability-zone az1 \
+      --nic net-id=${MY_DBS_NET} --nic net-id=${MY_WORK_NET} \
+      dbs01
+
+----
+
+
+userdata による自動インストール (3)
+===================================
+
+- 下記のコマンドを実行すると、起動中の仮想マシンのコンソールログ（末尾の30行）が 5 秒ごとに表示されます。
+
+  - タイミングにより "ERROR: The resource could not be found." と表示されますが、これは問題ありません。
+  - DB サーバーの起動が完了して、コンソールログにログインプロンプトが表示されるまで待ちます。
+
+コマンド実行::
+
+  $ watch -n5 nova console-log --length 30 dbs01
+
+  ...（中略）... 
+  CentOS release 6.6 (Final)
+  Kernel 2.6.32-504.el6.x86_64 on an x86_64
+   
+  dbs01 login:
+
+----
+
+metadata を利用した設定 (1)
+===========================
+
+- 次は APP サーバーの起動です。今度は metadata を利用して、
+  DB サーバーの IP アドレス (``dsb_ip``) を設定します。
+  後半がその部分です。詳細は後で確認します。
+
+スクリプトの内容::
+
+  $ cat userdata_app.txt 
+  #!/bin/bash
+  cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+  cd /root
+  git clone https://github.com/josug-book1-materials/sample-app.git
+  cd sample-app
+  git checkout -b v1.0 remotes/origin/v1.0
+  sh /root/sample-app/server-setup/install_rest.sh
+
+  yum install -y jq crudini
+  DBS_IP=`curl -s http://169.254.169.254/openstack/latest/meta_data.json \
+      | jq -r '.["meta"]["dbs_ip"]'`
+  crudini --set /root/sample-app/endpoint.conf db-server db_host $DBS_IP
+  sh /root/sample-app/server-setup/rest.init.sh start
+
+
+----
+
+metadata を利用した設定 (2)
+===========================
+
+- 下記のコマンドを実行し、APP サーバーを起動します。
+
+  - 先ほどのスクリプトを userdata に指定します。
+  - ``--meta`` オプションで DB サーバーの IP アドレスを "``dbs_ip``" という名前で渡します。
+
+コマンド実行::
+
+  $ MY_DBS_IP=`get_instance_ip dbs01 dbs-net`
+  $ echo $MY_DBS_IP
+  172.16.20.1
+  $ nova boot --flavor standard.xsmall --image "centos-base" \
+      --key-name default --user-data userdata_app.txt \
+      --security-groups \
+          sg-all-from-console,sg-all-from-app-net,sg-all-from-dbs-net \
+      --availability-zone az1 --nic net-id=${MY_APP_NET} \
+      --nic net-id=${MY_DBS_NET} --nic net-id=${MY_WORK_NET} \
+      --meta dbs_ip=${MY_DBS_IP} \
+      app01
+
+----
+
+web サーバーの起動 (1)
+======================
+
+- 最後は WEB サーバーの起動です。metadata を利用して、
+  今度は APP サーバーの IP アドレス (``app_ip``) を設定します。
+  後半がその部分です。
+
+スクリプトの内容::
+
+  $ cat userdata_web.txt 
+  #!/bin/bash
+  cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+  cd /root
+  git clone -q https://github.com/josug-book1-materials/sample-app.git
+  cd sample-app
+  git checkout -b v1.0 remotes/origin/v1.0
+  sh /root/sample-app/server-setup/install_web.sh
+
+  yum install -y jq crudini
+  APP_IP=`curl -s http://169.254.169.254/openstack/latest/meta_data.json \
+      | jq -r '.["meta"]["app_ip"]'`
+  crudini --set /root/sample-app/endpoint.conf rest-server rest_host $APP_IP
+  sh /root/sample-app/server-setup/web.init.sh start
+
+
+----
+
+web サーバーの起動 (2)
+======================
+
+- 下記のコマンドを実行し、WEB サーバーを起動します。 APP サーバーとほとんど同じです。
+  - ``--meta`` オプションで APP サーバーの IP アドレスを "``app_ip``" という名前で渡します。
+
+コマンド実行::
+
+  $ MY_APP_IP=`get_instance_ip app01 app-net`
+  $ echo $MY_APP_IP
+  172.16.10.1
+  $ nova boot \
+      --flavor standard.xsmall --image "centos-base" \
+      --key-name default --user-data userdata_web.txt \
+      --security-groups sg-all-from-console,sg-web-from-internet,sg-all-from-app-net \
+      --availability-zone az1 \
+      --nic net-id=${MY_DMZ_NET} --nic net-id=${MY_APP_NET} \
+      --meta app_ip=${MY_APP_IP} \
+      web01
+
+----
+
+アプリケーションの動作確認
+==========================
+
+- Web サーバーの起動が完了したら、下記のコマンドでフローティングIPを割り当てます。
+
+  - 最初のコマンドでフローティング IP を確保します。
+  - 割り当てられた IP を Web サーバーに割り当てます。
+
+- Webブラウザーから http://xxx.xxx.xxx.xxx にアクセスすると掲示板アプリが利用できます。
+
+コマンド実行::
+
+  $ nova floating-ip-create Ext-Net
+  +--------------+-----------+----------+---------+
+  | Ip           | Server Id | Fixed Ip | Pool    |
+  +--------------+-----------+----------+---------+
+  | 118.67.96.85 |           | -        | Ext-Net |
+  +--------------+-----------+----------+---------+
+  $ nova floating-ip-associate web01 118.67.96.85
+
+----
+
+構築した環境の全体像
+================
+
+- ここで構築した環境は下図のようになります。
+
+  - 「OpenStackクラウドインテグレーション」より引用
+
+(ネットワークトポロジーの図をここに載せられるとよい)
+
+----
+
+ネットワーク構成の確認方法
+================
+
+- IP アドレスの確認などは下記のコマンドで行います。
+- この後で使用するアドレスとしては以下があります。
+
+  - step-server の 2 つ目のアドレス (例: 118.67.96.82)
+  - web01 の dmz-net のアドレス (例: 192.168.0.1)
+  - app01 の work-net のアドレス (例: 10.0.0.4)
+
+コマンド実行::
+
+  $ nova list --fields name,networks
+  +--------------------------------------+-------------+-------------------------------------------------------------+
+  | ID                                   | Name        | Networks                                                    |
+  +--------------------------------------+-------------+-------------------------------------------------------------+
+  | d6e8c082-1839-46fb-93e6-f0d61ed1d149 | app01       | app-net=172.16.10.1; dbs-net=172.16.20.3; work-net=10.0.0.4 |
+  | 6c84a6c9-fdda-4fce-b576-5be757ba2a74 | dbs01       | dbs-net=172.16.20.1; work-net=10.0.0.3                      |
+  | b5440947-e245-4c7c-8d4f-301e5b75f34a | step-server | work-net=10.0.0.1, 118.67.96.82                             |
+  | 2fcebc7d-ada8-416a-bade-0abad4b319b8 | web01       | dmz-net=192.168.0.1; app-net=172.16.10.3                    |
+  +--------------------------------------+-------------+-------------------------------------------------------------+
+
+----
+
+userdata/metadata の裏側
+============================================
+
+- これで 3 階層システムの構築は完了です。ここで、userdata/metadata が仮想マシンの中からどのように参照されるかを見てみましょう。
+- WEB サーバーなどはインターネットからログインできないので、踏み台サーバー経由でログインします。
+  まず踏み台サーバーへログインします (work-netの 2つ目のアドレス)
+
+コマンド実行::
+
+  $ nova list --name step-server --fields name,networks
+  +--------------------------------------+-------------+---------------------------------+
+  | ID                                   | Name        | Networks                        |
+  +--------------------------------------+-------------+---------------------------------+
+  | b5440947-e245-4c7c-8d4f-301e5b75f34a | step-server | work-net=10.0.0.1, 118.67.96.82 |
+  +--------------------------------------+-------------+---------------------------------+
+  $ ssh -i default.pem root@118.67.96.82
+  [root@step-server ~]# 
+
+----
+
+仮想マシン内からの userdata 参照
+============================================
+
+- 169.254.169.254 という特別なアドレスにアクセスします。
+  起動時に渡した userdata が表示されます。
+
+コマンド実行::
+
+  [root@step-server ~]# ssh -i default.pem root@192.168.0.1
+  [root@web01 ~]# 
+  [root@web01 ~]# curl -s http://169.254.169.254/openstack/latest/; echo
+  meta_data.json
+  user_data
+  password
+  vendor_data.json
+  [root@web01 ~]# 
+  [root@web01 ~]# curl -s http://169.254.169.254/openstack/latest/user_data
+  #!/bin/bash
+  ...
+  APP_IP=`curl -s http://169.254.169.254/openstack/latest/meta_data.json \
+      | jq -r '.["meta"]["app_ip"]'`
+  crudini --set /root/sample-app/endpoint.conf rest-server rest_host $APP_IP
+  sh /root/sample-app/server-setup/web.init.sh start
+
+----
+
+仮想マシン内からの metadata 参照
+================================
+
+- metadata も同じように取得できます。 JSON 形式になっています。
+
+コマンド実行::
+
+  [root@web01 ~]# curl -s \
+      http://169.254.169.254/openstack/latest/meta_data.json
+  [root@web01 ~]# curl -s \
+      http://169.254.169.254/openstack/latest/meta_data.json | jq .
+  {
+    "name": "web01",
+    "public_keys": {
+      "default": "ssh-rsa AAAA...."
+    },
+    "meta": {
+      "app_ip": "172.16.10.1"
+    },
+    ...
+  }
+
+----
+
+仮想マシン内からの metadata 参照
+================================
+
+- userdata の中では metadata から app_data を取り出して、設定ファイルに設定しています。
+  同じことをコマンドでも試してみましょう。
+
+コマンド実行::
+
+  [root@web01 ~]# curl -s \
+      http://169.254.169.254/openstack/latest/meta_data.json \
+      | jq -r '.["meta"]["app_ip"]'
+  172.16.10.1
+
+userdata での参照例::
+
+  APP_IP=`curl -s http://169.254.169.254/openstack/latest/meta_data.json \
+      | jq -r '.["meta"]["app_ip"]'`
+  crudini --set /root/sample-app/endpoint.conf \
+      rest-server rest_host $APP_IP
+
+----
+
+後かたずけ
+================
+
+- 起動した仮想マシンをすべて削除します。
+- 下記のように、操作用仮想マシンからログアウトして、仮想マシンを削除するスクリプトを実行します。
+
+コマンド実行の様子::
+
+  [root@step-server ~]# logout
+  Connection to 118.67.96.82 closed.
+  $ cd /opt/support/t2-c1
+  $ pwd
+  /opt/support/t2-c1 <---「/opt/support/t2-c1」にいることを確認します。
+  $ ./9_cleanup.sh 
+  ### delete wed01
+  ### delete app01
+  ...
+  ==================================================
+  Cleanup completed!
+  ==================================================
+
+----
+
+ポイントとまとめ
+================
+
+- OpenStack 上への 3 階層ウェブシステムを例に、
+  userdata/metadata という OpenStack にデータを渡す仕組みを活用して、
+  アプリケーションのインストールと設定を自動化する方法を試しました。
+- userdata/metadata を使用すると、仮想マシンの動作を動的に制御できます。
+  - 仮想マシン起動時に処理を切り替える
+  - 仮想マシン構築時に決まる動的な情報をアプリケーションに渡す、など
+- より複雑な設定を行う場合は `Ansible を用いた設定 <./t2-c2.html>`_ と組み合わせるなど、
+  いろいろ工夫するとよいでしょう。
+
+
