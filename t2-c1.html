@@ -1584,7 +1584,12 @@ dbs01 login:
             <header><h1>metadata を利用した設定 (1)</h1></header>
             
             
-            <section><p>スクリプトの内容:</p>
+            <section><ul class="simple">
+<li>次は APP サーバーの起動です。今度は metadata を利用して、
+DB サーバーの IP アドレス (<tt class="docutils literal">dsb_ip</tt>) を設定します。
+後半がその部分です。詳細は後で確認します。</li>
+</ul>
+<p>スクリプトの内容:</p>
 <pre class="literal-block">
 $ cat userdata_app.txt
 #!/bin/bash
@@ -1680,7 +1685,12 @@ $ nova boot --flavor standard.xsmall --image &quot;centos-base&quot; \
             <header><h1>web サーバーの起動 (1)</h1></header>
             
             
-            <section><p>スクリプトの内容:</p>
+            <section><ul class="simple">
+<li>最後は WEB サーバーの起動です。metadata を利用して、
+今度は APP サーバーの IP アドレス (<tt class="docutils literal">app_ip</tt>) を設定します。
+後半がその部分です。</li>
+</ul>
+<p>スクリプトの内容:</p>
 <pre class="literal-block">
 $ cat userdata_web.txt
 #!/bin/bash
@@ -1727,7 +1737,8 @@ sh /root/sample-app/server-setup/web.init.sh start
             
             
             <section><ul class="simple">
-<li></li>
+<li>下記のコマンドを実行し、WEB サーバーを起動します。 APP サーバーとほとんど同じです。
+- <tt class="docutils literal"><span class="pre">--meta</span></tt> オプションで APP サーバーの IP アドレスを &quot;<tt class="docutils literal">app_ip</tt>&quot; という名前で渡します。</li>
 </ul>
 <p>コマンド実行:</p>
 <pre class="literal-block">
@@ -1902,10 +1913,15 @@ $ nova list --fields name,networks
         <div class="slide">
           <div class="inner">
             
-            <header><h1>踏み台サーバーへのログイン</h1></header>
+            <header><h1>userdata/metadata の裏側</h1></header>
             
             
-            <section><p>コマンド実行:</p>
+            <section><ul class="simple">
+<li>これで 3 階層システムの構築は完了です。ここで、userdata/metadata が仮想マシンの中からどのように参照されるかを見てみましょう。</li>
+<li>WEB サーバーなどはインターネットからログインできないので、踏み台サーバー経由でログインします。
+まず踏み台サーバーへログインします (work-netの 2つ目のアドレス)</li>
+</ul>
+<p>コマンド実行:</p>
 <pre class="literal-block">
 $ nova list --name step-server --fields name,networks
 +--------------------------------------+-------------+---------------------------------+
@@ -1945,7 +1961,11 @@ $ ssh -i default.pem root&#64;118.67.96.82
             <header><h1>仮想マシン内からの userdata 参照</h1></header>
             
             
-            <section><p>コマンド実行:</p>
+            <section><ul class="simple">
+<li>169.254.169.254 という特別なアドレスにアクセスします。
+起動時に渡した userdata が表示されます。</li>
+</ul>
+<p>コマンド実行:</p>
 <pre class="literal-block">
 [root&#64;step-server ~]# ssh -i default.pem root&#64;192.168.0.1
 [root&#64;web01 ~]#
@@ -1957,10 +1977,9 @@ vendor_data.json
 [root&#64;web01 ~]#
 [root&#64;web01 ~]# curl -s http://169.254.169.254/openstack/latest/user_data
 #!/bin/bash
-
 ...
-
-APP_IP=`curl -s http://169.254.169.254/openstack/latest/meta_data.json | jq -r '.[&quot;meta&quot;][&quot;app_ip&quot;]'`
+APP_IP=`curl -s http://169.254.169.254/openstack/latest/meta_data.json \
+    | jq -r '.[&quot;meta&quot;][&quot;app_ip&quot;]'`
 crudini --set /root/sample-app/endpoint.conf rest-server rest_host $APP_IP
 sh /root/sample-app/server-setup/web.init.sh start
 </pre></section>
@@ -1993,7 +2012,10 @@ sh /root/sample-app/server-setup/web.init.sh start
             <header><h1>仮想マシン内からの metadata 参照</h1></header>
             
             
-            <section><p>コマンド実行:</p>
+            <section><ul class="simple">
+<li>metadata も同じように取得できます。 JSON 形式になっています。</li>
+</ul>
+<p>コマンド実行:</p>
 <pre class="literal-block">
 [root&#64;web01 ~]# curl -s \
     http://169.254.169.254/openstack/latest/meta_data.json
@@ -2039,7 +2061,11 @@ sh /root/sample-app/server-setup/web.init.sh start
             <header><h1>仮想マシン内からの metadata 参照</h1></header>
             
             
-            <section><p>コマンド実行:</p>
+            <section><ul class="simple">
+<li>userdata の中では metadata から app_data を取り出して、設定ファイルに設定しています。
+同じことをコマンドでも試してみましょう。</li>
+</ul>
+<p>コマンド実行:</p>
 <pre class="literal-block">
 [root&#64;web01 ~]# curl -s \
     http://169.254.169.254/openstack/latest/meta_data.json \
@@ -2130,10 +2156,15 @@ Cleanup completed!
             <header><h1>ポイントとまとめ</h1></header>
             
             
-            <section><p>(記載する)</p>
-<ul class="simple">
-<li></li>
-<li></li>
+            <section><ul class="simple">
+<li>OpenStack 上への 3 階層ウェブシステムを例に、
+userdata/metadata という OpenStack にデータを渡す仕組みを活用して、
+アプリケーションのインストールと設定を自動化する方法を試しました。</li>
+<li>userdata/metadata を使用すると、仮想マシンの動作を動的に制御できます。
+- 仮想マシン起動時に処理を切り替える
+- 仮想マシン構築時に決まる動的な情報をアプリケーションに渡す、など</li>
+<li>より複雑な設定を行う場合は <a class="reference external" href="./t2-c2.html">Ansible を用いた設定</a> と組み合わせるなど、
+いろいろ工夫するとよいでしょう。</li>
 </ul></section>
             
           </div>
@@ -2243,7 +2274,7 @@ Cleanup completed!
       
       
       <tr id="toc-row-14">
-        <th><a href="#slide14">踏み台サーバーへのログイン</a></th>
+        <th><a href="#slide14">userdata/metadata の裏側</a></th>
         <td><a href="#slide14">14</a></td>
       </tr>
       
