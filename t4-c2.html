@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<!--
+  Copyright 2010 Google Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+  Original slides: Marcin Wichary (mwichary@google.com)
+  Modifications: Ernest Delgado (ernestd@google.com)
+                 Alex Russell (slightlyoff@chromium.org)
+
+  landslide modifications: Adam Zapletal (adamzap@gmail.com)
+                           Nicolas Perriault (nperriault@gmail.com)
+-->
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>FogとChefを使ったアプリケーションデプロイ</title>
+    <!-- Styles -->
+    
+    <link rel="stylesheet" media="print" href="file:///Users/teru/projects/hands-on-stack.github.io/theme/css/print.css">
+    <link rel="stylesheet" media="screen, projection" href="file:///Users/teru/projects/hands-on-stack.github.io/theme/css/screen.css">
+    
+    
+    <!-- /Styles -->
+    <!-- Javascripts -->
+    
+    <script type="text/javascript" src="file:///Users/teru/projects/hands-on-stack.github.io/theme/js/slides.js"></script>
+    
+    
+    <!-- /Javascripts -->
+</head>
+<body>
+  <div id="blank"></div>
+  <div class="presentation">
+    <div id="current_presenter_notes">
+      <div id="presenter_note"></div>
+    </div>
+    <div class="slides">
+      
+      <!-- slide source: t4-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>FogとChefを使ったアプリケーションデプロイ</h1></header>
+            
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t4-c2.rst">t4-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              1/11
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t4-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>概要</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>ここではFogを用いて仮想マシンを複数台作成し、役割に応じてChefでデプロイを行います。</li>
+<li>作成されるサーバは以下の通りです。studentXXの部分には、操作端末の番号が割り当てられます。<ul>
+<li>studentXXlb1 : ロードバランササーバー1</li>
+<li>studentXXweb1 : フロントWebサーバー1</li>
+<li>studentXXweb2 : フロントWebサーバー2</li>
+<li>studentXXapp1 : アプリサーバー</li>
+<li>studentXXdb1 : データベースサーバー</li>
+</ul>
+</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t4-c2.rst">t4-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              2/11
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t4-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>操作環境の準備</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>下記のコマンドで、Fogが導入されたサーバーを用意します。<ul>
+<li>コマンドの実行が完了するまで数分かかります。</li>
+<li>コマンドが終了すると、Fogサーバーへのログインコマンドが表示されます。</li>
+</ul>
+</li>
+</ul>
+<p>コマンド実行の様子:</p>
+<pre class="literal-block">
+---------ここから---------
+$ cd /opt/support/t4-c2
+$ ./01_init.sh
+(中略)
+####init.sh finished. Please login to fog-server by following command
+ssh -i ~/default.pem -oStrictHostKeyChecking=no fog&#64;IPアドレス
+---------ここまで---------
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t4-c2.rst">t4-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              3/11
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t4-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>Fogサーバーへのログイン</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>最後に表示されたコマンドで、Fogサーバーにログインします。</li>
+</ul>
+<p>コマンド実行:</p>
+<pre class="literal-block">
+---------ここから---------
+$ ssh -i ~/default.pem -oStrictHostKeyChecking=no fog&#64;IPアドレス
+---------ここまで---------
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t4-c2.rst">t4-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              4/11
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t4-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>仮想マシン作成とアプリデプロイ(1)</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>Fogサーバー上で下記のスクリプトを実行すると、以下のような流れで処理が進みます。<ul>
+<li>サーバ設定(yaml形式)を作成します。$HOMEにyamlが残るので、後で内容確認できます。</li>
+<li>yamlに沿って仮想マシンを作成します。1台完了すると『Create server studentXXdb1』と表示されます。</li>
+</ul>
+</li>
+</ul>
+<p>コマンド実行:</p>
+<pre class="literal-block">
+---------ここから---------
+$ ~/deploy_app.sh
+Created server student18db1
+(中略)
+---------ここまで---------
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t4-c2.rst">t4-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              5/11
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t4-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>仮想マシン作成とアプリデプロイ(2)</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>続き<ul>
+<li>作成したサーバーとicmpでの疎通ができるまで一定間隔でポーリングを繰り返します。疎通が取れると、『I found icmp session to student18db1』と表示され先に進みます。</li>
+</ul>
+</li>
+</ul>
+<p>コマンド実行:</p>
+<pre class="literal-block">
+---------ここから---------
+Created server student18db1
+(中略)
+waiting icmp session to student18db1
+I found icmp session to student18db1
+---------ここまで---------
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t4-c2.rst">t4-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              6/11
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t4-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>仮想マシン作成とアプリデプロイ(3)</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>続き<ul>
+<li>全サーバと疎通確認後、Chefサーバにcookbookとroleがアップロードされ、デプロイが始まります。</li>
+<li>一デプロイが完了ごとに、ログが表示されます。全デプロイが完了で処理は終了です。</li>
+</ul>
+</li>
+</ul>
+<p>コマンド実行:</p>
+<pre class="literal-block">
+---------ここから---------
+cookbooks uploaded.
+roles uploaded.
+(中略)
+deploy finished =&gt; student18db1
+check logfile =&gt; more /tmp/student18db1_bootstrap.log
+---------ここまで---------
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t4-c2.rst">t4-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              7/11
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t4-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>仮想マシン作成とアプリデプロイ(4)</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>続き<ul>
+<li>最後にアプリURL(studentXXlb1サーバ)が表示されます。ローカルIPアドレスは、nova listコマンドで確認ください。</li>
+<li>今回CUIのため、y3mでアプリにリクエストしてください。問題なければアプリが動作するはずです。</li>
+</ul>
+</li>
+</ul>
+<p>コマンド実行:</p>
+<pre class="literal-block">
+---------ここから---------
+Deploy finished. TRY w3m http://'local-ip-address-of-student18lb1' from this server
+---------ここまで---------
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t4-c2.rst">t4-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              8/11
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t4-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>構築した環境の全体像</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>今回、構築した環境は下図のようになります。(Openstack側)<ul>
+<li>「OpenStackクラウドインテグレーション」より引用</li>
+</ul>
+</li>
+</ul>
+<img alt="file:///Users/teru/projects/hands-on-stack.github.io/./_assets/t4-c2/01_environment.png" src="file:///Users/teru/projects/hands-on-stack.github.io/./_assets/t4-c2/01_environment.png" style="width: 70%;" /></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t4-c2.rst">t4-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              9/11
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t4-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>環境の削除</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>デモが終了したら、起動した仮想マシンやネットワーク環境をすべて削除します。</li>
+<li>下記のように、Fogサーバからログアウトして、作業PCに戻ってから環境を削除するスクリプトを実行します。</li>
+</ul>
+<p>コマンド実行:</p>
+<pre class="literal-block">
+---------ここから---------
+$ exit
+$ /opt/support/t4-c2/99_cleanup.sh
+---------ここまで---------
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t4-c2.rst">t4-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              10/11
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t4-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>まとめ</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>本スクリプトは、ソースは全く同じまま、yamlのデータを変更することでAWSやOpenstackといったパブリッククラウドの違いを意識せずに同じアプリのデプロイが可能です。ここでは、Openstackのデモを行いましたが、本著では、 AWSでの手順も紹介していますので是非試してみてください。</li>
+<li>本著では、Fogを利用したスクリプトに関する詳細な解説があります。詳しい処理内容にご興味がありましたら、本著をご確認ください。 もしくは、 github上からソースコードを取得することも可能です。</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t4-c2.rst">t4-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              11/11
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+  <div id="toc" class="sidebar hidden">
+    <h2>Table of Contents</h2>
+    <table>
+      <caption>Table of Contents</caption>
+      
+      <tr id="toc-row-1">
+        <th><a href="#slide1">FogとChefを使ったアプリケーションデプロイ</a></th>
+        <td><a href="#slide1">1</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-2">
+        <th><a href="#slide2">概要</a></th>
+        <td><a href="#slide2">2</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-3">
+        <th><a href="#slide3">操作環境の準備</a></th>
+        <td><a href="#slide3">3</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-4">
+        <th><a href="#slide4">Fogサーバーへのログイン</a></th>
+        <td><a href="#slide4">4</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-5">
+        <th><a href="#slide5">仮想マシン作成とアプリデプロイ(1)</a></th>
+        <td><a href="#slide5">5</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-6">
+        <th><a href="#slide6">仮想マシン作成とアプリデプロイ(2)</a></th>
+        <td><a href="#slide6">6</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-7">
+        <th><a href="#slide7">仮想マシン作成とアプリデプロイ(3)</a></th>
+        <td><a href="#slide7">7</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-8">
+        <th><a href="#slide8">仮想マシン作成とアプリデプロイ(4)</a></th>
+        <td><a href="#slide8">8</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-9">
+        <th><a href="#slide9">構築した環境の全体像</a></th>
+        <td><a href="#slide9">9</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-10">
+        <th><a href="#slide10">環境の削除</a></th>
+        <td><a href="#slide10">10</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-11">
+        <th><a href="#slide11">まとめ</a></th>
+        <td><a href="#slide11">11</a></td>
+      </tr>
+      
+      
+    </table>
+  </div>
+  
+  <div id="help" class="sidebar hidden">
+    <h2>Help</h2>
+    <table>
+      <caption>Help</caption>
+      <tr>
+        <th>Table of Contents</th>
+        <td>t</td>
+      </tr>
+      <tr>
+        <th>Exposé</th>
+        <td>ESC</td>
+      </tr>
+      <tr>
+        <th>Full screen slides</th>
+        <td>e</td>
+      </tr>
+      <tr>
+        <th>Presenter View</th>
+        <td>p</td>
+      </tr>
+      <tr>
+        <th>Source Files</th>
+        <td>s</td>
+      </tr>
+      <tr>
+        <th>Slide Numbers</th>
+        <td>n</td>
+      </tr>
+      <tr>
+        <th>Toggle screen blanking</th>
+        <td>b</td>
+      </tr>
+      <tr>
+        <th>Show/hide slide context</th>
+        <td>c</td>
+      </tr>
+      <tr>
+        <th>Notes</th>
+        <td>2</td>
+      </tr>
+      <tr>
+        <th>Help</th>
+        <td>h</td>
+      </tr>
+    </table>
+  </div>
+  <script>main()</script>
+</body>
+</html>
