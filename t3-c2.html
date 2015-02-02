@@ -1,0 +1,2101 @@
+<!DOCTYPE html>
+<!--
+  Copyright 2010 Google Inc.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+
+  Original slides: Marcin Wichary (mwichary@google.com)
+  Modifications: Ernest Delgado (ernestd@google.com)
+                 Alex Russell (slightlyoff@chromium.org)
+
+  landslide modifications: Adam Zapletal (adamzap@gmail.com)
+                           Nicolas Perriault (nperriault@gmail.com)
+-->
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>ボリュームの作成と接続</title>
+    <!-- Styles -->
+    
+    <style type="text/css" media="print">
+      * {
+    margin: 0;
+    padding: 0;
+}
+
+@page {
+    size: landscape;
+}
+
+body {
+    font: 100% "Lucida Grande", "Trebuchet MS", Verdana, sans-serif;
+    padding: 0;
+    margin: 0;
+}
+
+div.slide {
+    min-width: 800px;
+    min-height: 600px;
+    padding: 1em;
+    overflow: hidden;
+    page-break-after: always;
+    border: 1px solid black;
+    border-radius: 20px;
+}
+
+div.slide div.inner {
+    width: 800px;
+    height: 600px;
+    margin: auto;
+    display: table-cell;
+}
+
+h1 {
+    font-size: 2.4em;
+}
+
+h2 {
+    font-size: 2.0em;
+}
+
+h3 {
+    margin: 1.5em 0;
+}
+
+ul {
+    margin: 0;
+    padding: 0;
+}
+
+p, li, pre {
+    font-size: 1.8em;
+    margin: 1em 0;
+}
+
+li {
+    margin-left: 2em;
+}
+
+a {
+    color: #000000;
+}
+
+pre, code {
+    max-width: 800px;
+    background: #eee;
+    font-family: Monaco, monospace;
+    font-size: 90%;
+}
+
+pre {
+    padding: .2em .5em;
+    overflow: hidden;
+    border-radius: .8em;
+}
+
+code {
+    padding: 0 .2em;
+}
+
+.slide header:only-child h1 {
+  line-height: 180%;
+  text-align: center;
+  display: table-cell;
+  vertical-align: middle;
+  height: 600px;
+  width: 800px;
+  font-size: 48px;
+  margin-top:100px;
+  margin-bottom:100px;
+}
+
+#toc, #help, .slide aside, .slide footer, .slide .notes,
+.presenter_notes, #current_presenter_notes, #presenter_note {
+  display: none;
+}
+
+.colleft {
+  float: left;
+  max-width: 48%;
+  height: 550px;
+  padding-left: 2em;
+}
+
+.colright {
+  float: right;
+  max-width: 48%;
+  height: 550px;
+  padding: 0;
+}
+
+
+
+    </style>
+    <style type="text/css" media="screen, projection">
+      body {
+  font: 14px "Lucida Grande", "Trebuchet MS", Verdana, sans-serif;
+  background: #778;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
+div.presentation {
+  position: absolute;
+  width: 100%;
+  display: table-cell;
+  vertical-align: middle;
+  height: 100%;
+  background: inherit;
+}
+
+div.presentation > h1 {
+  display: none;
+}
+
+div.slides, body.expose div.slides.nocontext {
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  position: absolute;
+  display: block;
+}
+
+div.slides.nocontext {
+  width: 900px;
+  margin: 0 auto;
+  overflow: hidden;
+  position: relative;
+  left: auto;
+  top: auto;
+}
+
+div.slide {
+  display: inline;
+  position: absolute;
+  overflow: hidden;
+  width: 900px;
+  height: 700px;
+  margin-top: -350px;
+  margin-left: -400px;
+  left: 50%;
+  top: 50%;
+  background: -webkit-gradient(linear, left bottom, left top, from(#eef3f5), to(#fff));
+  background-color: #eee;
+  background: -moz-linear-gradient(bottom, #eef3f5, #fff);
+  -webkit-transition: margin 0.25s ease-in-out;
+  -moz-transition: margin 0.25s ease-in-out;
+  -o-transition: margin 0.25s ease-in-out;
+  border-top-left-radius: 20px;
+  -moz-border-radius-topleft: 20px;
+  -webkit-border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  -moz-border-radius-topright: 20px;
+  -webkit-border-top-right-radius: 20px;
+  border-bottom-right-radius: 20px;
+  -moz-border-radius-bottomright: 20px;
+  -webkit-border-bottom-right-radius: 20px;
+  border-bottom-left-radius: 20px;
+  -moz-border-radius-bottomleft: 20px;
+  -webkit-border-bottom-left-radius: 20px;
+}
+
+/* Expose */
+
+body.expose div.slides {
+  float: left;
+  position: relative;
+  overflow: auto;
+  margin-bottom: 10px;
+}
+
+body.expose div.slide {
+  display: block;
+  float: left;
+  position: relative;
+  left: auto !important;
+  top: auto !important;
+  margin: 10px !important;
+  -webkit-transition: none;
+  -moz-transition: none;
+  -o-transition: none;
+  -moz-transform: scale(.33, .33);
+  -moz-transform-origin: 0 0;
+  -webkit-transform: scale(.33, .33);
+  -webkit-transform-origin: 0 0;
+  -o-transform: scale(.33, .33);
+  -o-transform-origin: 0 0;
+  -webkit-transition: none;
+  -moz-transition: none;
+  -o-transition: none;
+  cursor: pointer;
+}
+
+body.expose div.slide:hover {
+  background: -webkit-gradient(linear, left bottom, left top, from(#eef3f5), to(#fff));
+  background-color: #eee;
+  background: -moz-linear-gradient(bottom, #eef3f5, #fff);
+}
+
+body.expose .slide-wrapper {
+  float: left;
+  position: relative;
+  margin: .5%;
+  width: 300px;
+  height: 233px;
+}
+
+body.expose .slide footer {
+}
+
+body.expose .slide .inner {
+}
+
+body.expose .slide.far-past,
+body.expose .slide.past,
+body.expose .slide.future,
+body.expose .slide.far-future {
+  margin-left: 0;
+}
+
+body.expose .slide.current {
+  background: -webkit-gradient(linear, left bottom, left top, from(#ddb), to(#fff));
+  background-color: #eee;
+  background: -moz-linear-gradient(bottom, #ddb, #fff);
+  border: 16px solid #fff;
+  -moz-transform: scale(.315, .315);
+  -moz-transform-origin: 0 0;
+  -webkit-transform: scale(.315, .315);
+  -webkit-transform-origin: 0 0;
+  -o-transform: scale(.315, .315);
+  -o-transform-origin: 0 0;
+}
+
+/* Presenter Mode */
+
+body.presenter_view div.slide {
+  display: inline;
+  position: absolute;
+  overflow: hidden;
+  -moz-transform: scale(.5, .5);
+  -moz-transform-origin: 0 0;
+  -webkit-transform: scale(.5, .5);
+  -webkit-transform-origin: 0 0;
+  -o-transform: scale(.5, .5);
+  -o-transform-origin: 0 0;
+    margin-top: -300px;
+}
+
+body.presenter_view .slide.far-past {
+  display: block;
+  margin-left: -1500px;
+}
+
+body.presenter_view .slide.past {
+  display: block;
+  margin-left: -975px;
+}
+
+body.presenter_view .slide.current {
+  display: block;
+  margin-left: -475px;
+  border: 8px solid maroon;
+  z-index: 2;
+}
+
+body.presenter_view .slide.future {
+  display: block;
+  margin-left: 25px;
+  z-index: 1;
+}
+
+body.presenter_view .slide.far-future {
+  display: block;
+  margin-left: 525px;
+}
+
+body.presenter_view div#current_presenter_notes {
+    visibility: visible;
+    display: block;
+    position: absolute;
+    overflow: auto;
+    vertical-align: middle;
+    left: 50%;
+    top: 50%;
+    margin-left: -475px;
+    margin-top: 100px;
+    z-index: 2;
+    width: 950px;
+    border-style: solid;
+    height: 30%;
+    background-color: silver;
+}
+
+body.presenter_view div#current_presenter_notes section {
+  font-family: "Lucida Grande", "Trebuchet MS", Verdana, sans-serif;
+  color: black;
+  text-shadow: rgba(0, 0, 0, 0.2) 0 2px 5px;
+  display: block;
+  overflow: visible;
+    position: relative;
+    background-color: #fffeff;
+    height: 120px;
+    margin-right: 30px;
+    margin-top: 60px;
+    margin-left: 30px;
+    padding-right: 10px;
+    padding-left: 10px;
+    padding-top: 10px;
+}
+
+body.presenter_view div#current_presenter_notes section p {
+    margin: 0;
+}
+
+body.presenter_view div#current_presenter_notes h1 {
+    font-size: 50%;
+    display: block;
+}
+
+div#current_presenter_notes {
+  display: none;
+}
+
+div.slide div.presenter_notes, div.slides div.presenter_notes {
+  display: none;
+}
+
+/* Slide styles */
+
+div.slide p {
+  font-size: 20px;
+}
+
+.slide.far-past {
+  display: block;
+  margin-left: -2400px;
+}
+
+.slide.past {
+  display: block;
+  margin-left: -1400px;
+}
+
+.slide.current {
+  display: block;
+  margin-left: -450px;
+}
+
+.slide.future {
+  display: block;
+  margin-left: 500px;
+}
+
+.slide.far-future {
+  display: block;
+  margin-left: 1500px;
+}
+
+body.three-d div.slides {
+  -webkit-transform: translateX(50px) scale(0.8) rotateY(10deg);
+  -moz-transform: translateX(50px) scale(0.8) rotateY(10deg);
+  -o-transform: translateX(50px) scale(0.8) rotateY(10deg);
+}
+
+
+/* Content */
+
+header:not(:only-child) {
+  font-family: "Lucida Grande", "Trebuchet MS", Verdana, sans-serif;
+  font-weight: normal;
+  font-size: 50px;
+  border-bottom: 3px solid #777;
+  letter-spacing: -.05em;
+  color: #cf2f19;
+  text-shadow: rgba(0, 0, 0, 0.2) 0 2px 5px;
+  position: relative;
+  left: 30px;
+  top: 25px;
+  margin: 0;
+  padding: 0;
+}
+
+header h1, header h2, header h3, header h4, header h5, header h6 {
+  display: inline;
+  font-size: 100%;
+  font-weight: normal;
+  padding: 0;
+  margin: 0;
+}
+
+header h2:first-child {
+  margin-top: 0;
+}
+
+section, .slide header:only-child h1 {
+  font-family: "Lucida Grande", "Trebuchet MS", Verdana, sans-serif;
+  color: #3f3f3f;
+  text-shadow: rgba(0, 0, 0, 0.2) 0 2px 5px;
+  margin-left: 30px;
+  margin-right: 30px;
+  margin-top: 40px;
+  display: block;
+  overflow: hidden;
+}
+
+img { display: block; margin: auto; max-width: 100%; max-height: 100%}
+
+section img.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+section img.align-right {
+  display: inline;
+  margin-left: auto;
+  margin-right: 0;
+  float: right;
+}
+
+section img.align-left {
+  display: block;
+  margin-right: auto;
+  margin-left: 0;
+}
+
+a {
+  color: inherit;
+  display: inline-block;
+  text-decoration: underline;
+  line-height: 110%;
+}
+
+pre, code, tt {
+  font-family: Monaco, Consolas, 'Bitstream Vera Sans Mono', 'Lucida Console', FreeMono, Courier, monospace;
+}
+
+pre, .gist .gist-file .gist-data {
+  font-size: 18px;
+  max-height: 485px;
+  padding-top: 0.25em !important;
+  padding-right: 0.5em !important;
+  padding-left: 0.5em !important;
+  overflow: auto;
+}
+
+/* render a nice scrollbar in overflowed pre area's */
+::-webkit-scrollbar {
+  height: 8px;
+  width: 8px;
+}
+::-webkit-scrollbar-thumb {
+  background: -webkit-gradient(linear, left bottom, left top, from(#777), to(#bbd));
+  -webkit-border-radius: 1ex;
+}
+::-webkit-scrollbar-corner {
+  background: #dedede;
+}
+
+blockquote {
+  border-left: solid 8px #778;
+  padding: .1ex 1ex;
+  font-style: italic;
+}
+
+li {
+  padding: 10px 0;
+  font-size: 30px;
+}
+
+li pre { margin-left: 0em; }
+
+.slide header:only-child h1 {
+  line-height: 180%;
+  text-align: center;
+  display: table-cell;
+  vertical-align: middle;
+  height: 700px;
+  width: 900px;
+  font-size: 50px;
+  margin-top:100px;
+  margin-bottom:100px;
+}
+
+.sidebar {
+  clear: both;
+  background: -webkit-gradient(linear, top right, bottom right, from(#dde), to(#fff));
+  -webkit-transition: margin 0.25s ease-in-out;
+  background-color: #eee;
+  background: -moz-linear-gradient(right, #dde, #fff);
+  border-right: 5px solid #ccd;
+  z-index: 9999999;
+  height: 100%;
+  overflow: hidden;
+  top: 0;
+  position: absolute;
+  display: block;
+  margin: 0;
+  margin-left: -400px;
+  padding: 10px 16px;
+  overflow: auto;
+  -webkit-transition: margin 0.2s ease-in-out;
+  -moz-transition: margin 0.2s ease-in-out;
+  -o-transition: margin 0.2s ease-in-out;
+}
+
+.sidebar h2 {
+  text-shadow: rgba(0, 0, 0, 0.2) 0 2px 5px;
+  margin: 0 0 16px;
+  padding: 0;
+}
+
+.sidebar table {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border-collapse: collapse;
+}
+
+.sidebar table caption {
+  display: none;
+}
+
+.sidebar tr {
+  margin: 2px 0;
+  border-bottom: 1px solid #ccc;
+}
+
+.sidebar th {
+  text-align: left;
+  font-weight: normal;
+  max-width: 300px;
+  overflow: hidden;
+}
+
+.sidebar tr.sub th {
+  text-indent: 20px;
+}
+
+.sidebar td {
+  text-align: right;
+  min-width: 20px;
+}
+
+.sidebar a {
+  display: block;
+  text-decoration: none;
+  border-bottom: none;
+  padding: 4px 0;
+}
+
+.sidebar tr.active {
+  background: #ff0;
+}
+
+aside {
+  display: none;
+}
+  aside.source {
+    position: absolute;
+    bottom: 6px;
+    left: 10px;
+    text-indent: 10px;
+  }
+  aside.page_number {
+    position: absolute;
+    bottom: 6px;
+    right: 10px;
+    text-indent: 10px;
+  }
+
+.notes {
+  display: none;
+  padding: 10px;
+  background: #ccc;
+  border-radius: 10px;
+  -moz-border-radius: 10px;
+  -webkit-border-radius: 10px;
+}
+  div.slide p.notes {
+    font-size: 90%;
+}
+
+/* Pygments default theme */
+.hll { background-color: #ffffcc }
+.c { color: #408080; font-style: italic } /* Comment */
+.err { border: 1px solid #FF0000 } /* Error */
+.k { color: #008000; font-weight: bold } /* Keyword */
+.o { color: #666666 } /* Operator */
+.cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.cp { color: #BC7A00 } /* Comment.Preproc */
+.c1 { color: #408080; font-style: italic } /* Comment.Single */
+.cs { color: #408080; font-style: italic } /* Comment.Special */
+.gd { color: #A00000 } /* Generic.Deleted */
+.ge { font-style: italic } /* Generic.Emph */
+.gr { color: #FF0000 } /* Generic.Error */
+.gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.gi { color: #00A000 } /* Generic.Inserted */
+.go { color: #808080 } /* Generic.Output */
+.gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.gs { font-weight: bold } /* Generic.Strong */
+.gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.gt { color: #0040D0 } /* Generic.Traceback */
+.kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.kp { color: #008000 } /* Keyword.Pseudo */
+.kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.kt { color: #B00040 } /* Keyword.Type */
+.m { color: #666666 } /* Literal.Number */
+.s { color: #BA2121 } /* Literal.String */
+.na { color: #7D9029 } /* Name.Attribute */
+.nb { color: #008000 } /* Name.Builtin */
+.nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.no { color: #880000 } /* Name.Constant */
+.nd { color: #AA22FF } /* Name.Decorator */
+.ni { color: #999999; font-weight: bold } /* Name.Entity */
+.ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.nf { color: #0000FF } /* Name.Function */
+.nl { color: #A0A000 } /* Name.Label */
+.nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.nt { color: #008000; font-weight: bold } /* Name.Tag */
+.nv { color: #19177C } /* Name.Variable */
+.ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.w { color: #bbbbbb } /* Text.Whitespace */
+.mf { color: #666666 } /* Literal.Number.Float */
+.mh { color: #666666 } /* Literal.Number.Hex */
+.mi { color: #666666 } /* Literal.Number.Integer */
+.mo { color: #666666 } /* Literal.Number.Oct */
+.sb { color: #BA2121 } /* Literal.String.Backtick */
+.sc { color: #BA2121 } /* Literal.String.Char */
+.sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.s2 { color: #BA2121 } /* Literal.String.Double */
+.se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.sh { color: #BA2121 } /* Literal.String.Heredoc */
+.si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.sx { color: #008000 } /* Literal.String.Other */
+.sr { color: #BB6688 } /* Literal.String.Regex */
+.s1 { color: #BA2121 } /* Literal.String.Single */
+.ss { color: #19177C } /* Literal.String.Symbol */
+.bp { color: #008000 } /* Name.Builtin.Pseudo */
+.vc { color: #19177C } /* Name.Variable.Class */
+.vg { color: #19177C } /* Name.Variable.Global */
+.vi { color: #19177C } /* Name.Variable.Instance */
+.il { color: #666666 } /* Literal.Number.Integer.Long */
+.lineno { padding-right: 10px } /* A few space after linenos */
+
+#blank {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: black;
+  width: 100%;
+  height: 100%;
+  z-index: 64;
+  display: none;
+}
+
+.colleft {
+  float: left;
+  max-width: 48%;
+  height: 600px;
+  padding-left: 2em;
+}
+
+.colright {
+  float: right;
+  max-width: 48%;
+  height: 600px;
+  padding: 0;
+}
+
+    </style>
+    
+    
+    <!-- /Styles -->
+    <!-- Javascripts -->
+    
+    <script>
+      function main() {
+    // Since we don't have the fallback of attachEvent and
+    // other IE only stuff we won't try to run JS for IE.
+    // It will run though when using Google Chrome Frame
+    if (document.all) { return; }
+
+    var currentSlideNo;
+    var notesOn = false;
+    var expanded = false;
+    var hiddenContext = false;
+    var blanked = false;
+    var slides = document.getElementsByClassName('slide');
+    var touchStartX = 0;
+    var spaces = /\s+/, a1 = [''];
+    var tocOpened = false;
+    var helpOpened = false;
+    var overviewActive = false;
+    var modifierKeyDown = false;
+    var scale = 1;
+    var showingPresenterView = false;
+    var presenterViewWin = null;
+    var isPresenterView = false;
+
+    var str2array = function(s) {
+        if (typeof s == 'string' || s instanceof String) {
+            if (s.indexOf(' ') < 0) {
+                a1[0] = s;
+                return a1;
+            } else {
+                return s.split(spaces);
+            }
+        }
+        return s;
+    };
+
+    var trim = function(str) {
+        return str.replace(/^\s\s*/, '').replace(/\s\s*$/, '');
+    };
+
+    var addClass = function(node, classStr) {
+        classStr = str2array(classStr);
+        var cls = ' ' + node.className + ' ';
+        for (var i = 0, len = classStr.length, c; i < len; ++i) {
+            c = classStr[i];
+            if (c && cls.indexOf(' ' + c + ' ') < 0) {
+                cls += c + ' ';
+            }
+        }
+        node.className = trim(cls);
+    };
+
+    var removeClass = function(node, classStr) {
+        var cls;
+        if (!node) {
+            throw 'no node provided';
+        }
+        if (classStr !== undefined) {
+            classStr = str2array(classStr);
+            cls = ' ' + node.className + ' ';
+            for (var i = 0, len = classStr.length; i < len; ++i) {
+                cls = cls.replace(' ' + classStr[i] + ' ', ' ');
+            }
+            cls = trim(cls);
+        } else {
+            cls = '';
+        }
+        if (node.className != cls) {
+            node.className = cls;
+        }
+    };
+
+    var getSlideEl = function(slideNo) {
+        if (slideNo > 0) {
+            return slides[slideNo - 1];
+        } else {
+            return null;
+        }
+    };
+
+    var getSlideTitle = function(slideNo) {
+        var el = getSlideEl(slideNo);
+        if (el) {
+            var headers = el.getElementsByTagName('header');
+            if (headers.length > 0) {
+                return el.getElementsByTagName('header')[0].innerText;
+            }
+        }
+        return null;
+    };
+
+    var getSlidePresenterNote = function(slideNo) {
+        var el = getSlideEl(slideNo);
+        if (el) {
+            var n = el.getElementsByClassName('presenter_notes');
+            if (n.length > 0) {
+                return n[0];
+            }
+        }
+        return null;
+    };
+
+    var changeSlideElClass = function(slideNo, className) {
+        var el = getSlideEl(slideNo);
+        if (el) {
+            removeClass(el, 'far-past past current future far-future');
+            addClass(el, className);
+        }
+    };
+
+    var updateSlideClasses = function(updateOther) {
+        window.location.hash = (isPresenterView ? "presenter" : "slide") + currentSlideNo;
+
+        for (var i=1; i<currentSlideNo-1; i++) {
+            changeSlideElClass(i, 'far-past');
+        }
+
+        changeSlideElClass(currentSlideNo - 1, 'past');
+        changeSlideElClass(currentSlideNo, 'current');
+        changeSlideElClass(currentSlideNo + 1, 'future');
+
+        for (i=currentSlideNo+2; i<slides.length+1; i++) {
+            changeSlideElClass(i, 'far-future');
+        }
+
+        highlightCurrentTocLink();
+
+        processContext();
+
+        document.getElementsByTagName('title')[0].innerText = getSlideTitle(currentSlideNo);
+
+        updatePresenterNotes();
+
+        if (updateOther) { updateOtherPage(); }
+    };
+
+    var updatePresenterNotes = function() {
+        if (!isPresenterView) { return; }
+
+        var existingNote = document.getElementById('current_presenter_notes');
+        var currentNote = getSlidePresenterNote(currentSlideNo).cloneNode(true);
+        currentNote.setAttribute('id', 'presenter_note');
+
+        existingNote.replaceChild(currentNote, document.getElementById('presenter_note'));
+    };
+
+    var highlightCurrentTocLink = function() {
+        var toc = document.getElementById('toc');
+
+        if (toc) {
+            var tocRows = toc.getElementsByTagName('tr');
+            for (var i=0; i<tocRows.length; i++) {
+                removeClass(tocRows.item(i), 'active');
+            }
+
+            var currentTocRow = document.getElementById('toc-row-' + currentSlideNo);
+            if (currentTocRow) {
+                addClass(currentTocRow, 'active');
+            }
+        }
+    };
+
+    var updateOtherPage = function() {
+        if (!showingPresenterView) { return; }
+
+        var w = isPresenterView ? window.opener : presenterViewWin;
+        w.postMessage('slide#' + currentSlideNo, '*');
+    };
+
+    var nextSlide = function() {
+        if (currentSlideNo < slides.length) {
+            currentSlideNo++;
+        }
+        updateSlideClasses(true);
+    };
+
+    var prevSlide = function() {
+        if (currentSlideNo > 1) {
+            currentSlideNo--;
+        }
+        updateSlideClasses(true);
+    };
+
+    var showNotes = function() {
+        var notes = getSlideEl(currentSlideNo).getElementsByClassName('notes');
+        for (var i = 0, len = notes.length; i < len; i++) {
+            notes.item(i).style.display = (notesOn) ? 'none':'block';
+        }
+        notesOn = !notesOn;
+    };
+
+    var showSlideNumbers = function() {
+        var asides = document.getElementsByClassName('page_number');
+        var hidden = asides[0].style.display != 'block';
+        for (var i = 0; i < asides.length; i++) {
+            asides.item(i).style.display = hidden ? 'block' : 'none';
+        }
+    };
+
+    var showSlideSources = function() {
+        var asides = document.getElementsByClassName('source');
+        var hidden = asides[0].style.display != 'block';
+        for (var i = 0; i < asides.length; i++) {
+            asides.item(i).style.display = hidden ? 'block' : 'none';
+        }
+    };
+
+    var showToc = function() {
+        if (helpOpened) {
+                showHelp();
+        }
+        var toc = document.getElementById('toc');
+        if (toc) {
+            toc.style.marginLeft = tocOpened ? '-' + (toc.clientWidth + 20) + 'px' : '0px';
+            tocOpened = !tocOpened;
+        }
+        updateOverview();
+    };
+
+    var showHelp = function() {
+        if (tocOpened) {
+                showToc();
+        }
+
+        var help = document.getElementById('help');
+
+        if (help) {
+            help.style.marginLeft = helpOpened ? '-' + (help.clientWidth + 20) + 'px' : '0px';
+            helpOpened = !helpOpened;
+        }
+    };
+
+    var showPresenterView = function() {
+        if (isPresenterView) { return; }
+
+        if (showingPresenterView) {
+            presenterViewWin.close();
+            presenterViewWin = null;
+            showingPresenterView = false;
+        } else {
+            presenterViewWin = open(window.location.pathname + "#presenter" + currentSlideNo, 'presenter_notes',
+                                                                    'directories=no,location=no,toolbar=no,menubar=no,copyhistory=no');
+            showingPresenterView = true;
+        }
+    };
+
+    var switch3D = function() {
+        if (document.body.className.indexOf('three-d') == -1) {
+            document.getElementsByClassName('presentation')[0].style.webkitPerspective = '1000px';
+            document.body.className += ' three-d';
+        } else {
+            window.setTimeout('document.getElementsByClassName(\'presentation\')[0].style.webkitPerspective = \'0\';', 2000);
+            document.body.className = document.body.className.replace(/three-d/, '');
+        }
+    };
+
+    var toggleOverview = function() {
+        if (!overviewActive) {
+            addClass(document.body, 'expose');
+            overviewActive = true;
+            setScale(1);
+        } else {
+            removeClass(document.body, 'expose');
+            overviewActive = false;
+            if (expanded) {
+                setScale(scale);    // restore scale
+            }
+        }
+        processContext();
+        updateOverview();
+    };
+
+    var updateOverview = function() {
+        try {
+            var presentation = document.getElementsByClassName('presentation')[0];
+        } catch (e) {
+            return;
+        }
+
+        if (isPresenterView) {
+            var action = overviewActive ? removeClass : addClass;
+            action(document.body, 'presenter_view');
+        }
+
+        var toc = document.getElementById('toc');
+
+        if (!toc) {
+            return;
+        }
+
+        if (!tocOpened || !overviewActive) {
+            presentation.style.marginLeft = '0px';
+            presentation.style.width = '100%';
+        } else {
+            presentation.style.marginLeft = toc.clientWidth + 'px';
+            presentation.style.width = (presentation.clientWidth - toc.clientWidth) + 'px';
+        }
+    };
+
+    var computeScale = function() {
+        var cSlide = document.getElementsByClassName('current')[0];
+        var sx = cSlide.clientWidth / window.innerWidth;
+        var sy = cSlide.clientHeight / window.innerHeight;
+        return 1 / Math.max(sx, sy);
+    };
+
+    var setScale = function(scale) {
+        var presentation = document.getElementsByClassName('slides')[0];
+        var transform = 'scale(' + scale + ')';
+        presentation.style.MozTransform = transform;
+        presentation.style.WebkitTransform = transform;
+        presentation.style.OTransform = transform;
+        presentation.style.msTransform = transform;
+        presentation.style.transform = transform;
+    };
+
+    var expandSlides = function() {
+        if (overviewActive) {
+            return;
+        }
+        if (expanded) {
+            setScale(1);
+            expanded = false;
+        } else {
+            scale = computeScale();
+            setScale(scale);
+            expanded = true;
+        }
+    };
+
+    var showContext = function() {
+        try {
+            var presentation = document.getElementsByClassName('slides')[0];
+            removeClass(presentation, 'nocontext');
+        } catch (e) {}
+    };
+
+    var hideContext = function() {
+        try {
+            var presentation = document.getElementsByClassName('slides')[0];
+            addClass(presentation, 'nocontext');
+        } catch (e) {}
+    };
+
+    var processContext = function() {
+        if (hiddenContext) {
+            hideContext();
+        } else {
+            showContext();
+        }
+    };
+
+    var toggleContext = function() {
+        hiddenContext = !hiddenContext;
+        processContext();
+    };
+
+    var toggleBlank = function() {
+        blank_elem = document.getElementById('blank');
+
+        blank_elem.style.display = blanked ? 'none' : 'block';
+
+        blanked = !blanked;
+    };
+
+    var isModifierKey = function(keyCode) {
+        switch (keyCode) {
+            case 16: // shift
+            case 17: // ctrl
+            case 18: // alt
+            case 91: // command
+                return true;
+                break;
+            default:
+                return false;
+                break;
+        }
+    };
+
+    var checkModifierKeyUp = function(event) {
+        if (isModifierKey(event.keyCode)) {
+            modifierKeyDown = false;
+        }
+    };
+
+    var checkModifierKeyDown = function(event) {
+        if (isModifierKey(event.keyCode)) {
+            modifierKeyDown = true;
+        }
+    };
+
+    var handleBodyKeyDown = function(event) {
+        switch (event.keyCode) {
+            case 13: // Enter
+                if (overviewActive) {
+                    toggleOverview();
+                }
+                break;
+            case 27: // ESC
+                toggleOverview();
+                break;
+            case 37: // left arrow
+            case 33: // page up
+                event.preventDefault();
+                prevSlide();
+                break;
+            case 39: // right arrow
+            case 32: // space
+            case 34: // page down
+                event.preventDefault();
+                nextSlide();
+                break;
+            case 50: // 2
+                if (!modifierKeyDown) {
+                        showNotes();
+                }
+                break;
+            case 51: // 3
+                if (!modifierKeyDown && !overviewActive) {
+                    switch3D();
+                }
+                break;
+            case 190: // .
+            case 48: // 0
+            case 66: // b
+                if (!modifierKeyDown && !overviewActive) {
+                    toggleBlank();
+                }
+                break;
+            case 67: // c
+                if (!modifierKeyDown && !overviewActive) {
+                    toggleContext();
+                }
+                break;
+            case 69: // e
+                if (!modifierKeyDown && !overviewActive) {
+                    expandSlides();
+                }
+                break;
+            case 72: // h
+                showHelp();
+                break;
+            case 78: // n
+                if (!modifierKeyDown && !overviewActive) {
+                    showSlideNumbers();
+                }
+                break;
+            case 80: // p
+                if (!modifierKeyDown && !overviewActive) {
+                    showPresenterView();
+                }
+                break;
+            case 83: // s
+                if (!modifierKeyDown && !overviewActive) {
+                    showSlideSources();
+                }
+                break;
+            case 84: // t
+                showToc();
+                break;
+        }
+    };
+
+    var handleWheel = function(event) {
+        if (tocOpened || helpOpened || overviewActive) {
+            return;
+        }
+
+        var delta = 0;
+
+        if (!event) {
+            event = window.event;
+        }
+
+        if (event.wheelDelta) {
+            delta = event.wheelDelta/120;
+            if (window.opera) delta = -delta;
+        } else if (event.detail) {
+            delta = -event.detail/3;
+        }
+
+        if (delta && delta <0) {
+            nextSlide();
+        } else if (delta) {
+            prevSlide();
+        }
+    };
+
+    var addSlideClickListeners = function() {
+        for (var i=0; i < slides.length; i++) {
+            var slide = slides.item(i);
+            slide.num = i + 1;
+            slide.addEventListener('click', function(e) {
+                if (overviewActive) {
+                    currentSlideNo = this.num;
+                    toggleOverview();
+                    updateSlideClasses(true);
+                    e.preventDefault();
+                }
+                return false;
+            }, true);
+        }
+    };
+
+    var addRemoteWindowControls = function() {
+        window.addEventListener("message", function(e) {
+            if (e.data.indexOf("slide#") != -1) {
+                    currentSlideNo = Number(e.data.replace('slide#', ''));
+                    updateSlideClasses(false);
+            }
+        }, false);
+    };
+
+    var addTouchListeners = function() {
+        document.addEventListener('touchstart', function(e) {
+            touchStartX = e.touches[0].pageX;
+        }, false);
+        document.addEventListener('touchend', function(e) {
+            var pixelsMoved = touchStartX - e.changedTouches[0].pageX;
+            var SWIPE_SIZE = 150;
+            if (pixelsMoved > SWIPE_SIZE) {
+                nextSlide();
+            }
+            else if (pixelsMoved < -SWIPE_SIZE) {
+             prevSlide();
+            }
+        }, false);
+    };
+
+    var addTocLinksListeners = function() {
+        var toc = document.getElementById('toc');
+        if (toc) {
+            var tocLinks = toc.getElementsByTagName('a');
+            for (var i=0; i < tocLinks.length; i++) {
+                tocLinks.item(i).addEventListener('click', function(e) {
+                    currentSlideNo = Number(this.attributes['href'].value.replace('#slide', ''));
+                    updateSlideClasses(true);
+                    e.preventDefault();
+                }, true);
+            }
+        }
+    };
+
+    // initialize
+
+    (function() {
+        if (window.location.hash == "") {
+            currentSlideNo = 1;
+        } else if (window.location.hash.indexOf("#presenter") != -1) {
+            currentSlideNo = Number(window.location.hash.replace('#presenter', ''));
+            isPresenterView = true;
+            showingPresenterView = true;
+            presenterViewWin = window;
+            addClass(document.body, 'presenter_view');
+        } else {
+            currentSlideNo = Number(window.location.hash.replace('#slide', ''));
+        }
+
+        document.addEventListener('keyup', checkModifierKeyUp, false);
+        document.addEventListener('keydown', handleBodyKeyDown, false);
+        document.addEventListener('keydown', checkModifierKeyDown, false);
+        document.addEventListener('DOMMouseScroll', handleWheel, false);
+
+        window.onmousewheel = document.onmousewheel = handleWheel;
+        window.onresize = expandSlides;
+
+        for (var i = 0, el; el = slides[i]; i++) {
+            addClass(el, 'slide far-future');
+        }
+        updateSlideClasses(false);
+
+        // add support for finger events (filter it by property detection?)
+        addTouchListeners();
+
+        addTocLinksListeners();
+
+        addSlideClickListeners();
+
+        addRemoteWindowControls();
+    })();
+}
+
+    </script>
+    
+    
+    <!-- /Javascripts -->
+</head>
+<body>
+  <div id="blank"></div>
+  <div class="presentation">
+    <div id="current_presenter_notes">
+      <div id="presenter_note"></div>
+    </div>
+    <div class="slides">
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>ボリュームの作成と接続</h1></header>
+            
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              1/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>概要</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>ここではサンプルアプリケーションのデータベース上のデータをボリュームに移行します。</li>
+<li>まずOpenStack上にボリュームを作成し、サンプルアプリケーションの稼働する仮想サーバーにマウントします。</li>
+<li>マウントしたボリュームにデータベース上のデータを移行し、サンプルアプリケーションを稼働させます。</li>
+</ul>
+<img alt="./_assets/c2-t3/00-base-image.png" src="data:image/png;base64,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" style="width: 55%;" /></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              2/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>操作環境の準備</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>下記のコマンドではサンプルアプリケーションの動作する仮想サーバーを起動し、Floating IPを割り当てています。起動には１分から数分かかります。</li>
+</ul>
+<p>初期設定実行:</p>
+<pre class="literal-block">
+--- ここから ---
+
+$ cd /opt/support/t3-c2
+$ ./01_init.sh
+# Creating seurity-group :sg-for-web-student03
+# Booting Server :t3-c2-student03
+# Create Floating IP
+# Associate Floating IP &lt;Floating IP&gt;
+# t3-c2-student03 : &lt;Floating IP&gt;
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              3/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>操作環境の確認(1)</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>作成した仮想マシンにログインし、ディスクの状態を確認します。</li>
+</ul>
+<p>仮想マシンの操作:</p>
+<pre class="literal-block">
+--- ここから ---
+# ssh  -i ~/default.pem root&#64;&lt;Floating IP&gt; -i default.pem
+
+# lsblk
+NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+vda    252:0    0  10G  0 disk
+└─vda1 252:1    0  10G  0 part /
+vdb    252:16   0  10G  0 disk /mnt
+
+# exit
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              4/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>操作環境の確認(2)</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>ブラウザからサンプルアプリケーションを開き、データを登録します。</li>
+</ul>
+<img alt="./_assets/c2-t3/01-init.png" src="data:image/png;base64,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A7FuJ8VhiJwH01I5by9dvv/k4uKXvLP0n7fNoeFufWf0PL+4ny6Vu+1cf9uzNDR7pVT9cPHS3LZfOTzy8H0g3GmILPrBSy9dDZq9WJ2ll97p3VN/30/6wVFv/cQ7e0PdKr30MrZ1VKoy9OrNxcVcf136pu9vLA17/1y5a35bnxvaurZjMczbOm36/t7Ss185PPLkfQCT4o8yj/49Qg6nw9JTlm0ztnU0jOJ+1NTpbj6qzlk/mPSDST+4OgJYmBQAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfABkkXwAZJF8AGSRfAAk+eef/wHwB6DEgX1JQgAAAABJRU5ErkJggg==" style="width: 85%;" /></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              5/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>ボリュームの作成と接続</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>それではボリュームを作成します。</li>
+</ul>
+<p>cinderコマンドによるボリュームの作成:</p>
+<pre class="literal-block">
+--- ここから ---
+cinder create --display-name vol01-${USER} 10
++---------------------+--------------------------------------+
+|       Property      |                Value                 |
++---------------------+--------------------------------------+
+(中略)
+|      created_at     |      2015-01-29T12:13:40.743312      |
+| display_description |                 None                 |
+|     display_name    |            vol01-${USER}             |
+|          id         |     &lt; 表示されるIDを控えます。&gt;      |
+(中略)
+|        status       |               creating               |
+|     volume_type     |                 None                 |
++---------------------+--------------------------------------+
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              6/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>仮想マシンへのボリュームの接続</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>作成したボリュームを仮想マシンへ接続します。ボリュームの接続にはボリュームのUUIDを指定します。</li>
+</ul>
+<p>cinderコマンドによるボリュームの作成:</p>
+<pre class="literal-block">
+--- ここから ---
+nova volume-attach t3-c2-${USER} &lt;作成したボリュームのID&gt;
++----------+--------------------------------------+
+| Property | Value                                |
++----------+--------------------------------------+
+| device   | /dev/vdc                             |
+| id       | 2237cdb7-7174-42fe-b169-a0e825ab9d52 |
+| serverId | d53c42b6-7242-4b40-8581-647c01eb19fb |
+| volumeId |     &lt;作成したボリュームのID&gt;         |
++----------+--------------------------------------+
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              7/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>仮想マシンへのログイン</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>作成した仮想マシンにログインしディスクが接続されていることを確認します。</li>
+</ul>
+<p>仮想マシンの操作:</p>
+<pre class="literal-block">
+--- ここから ---
+$ ssh  -i ~/default.pem root&#64;&lt;Floating IP&gt;
+$ lsblk
+NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+vda     252:0    0  10G  0 disk
+└-vda1 252:1    0  10G  0 part /
+vdb     252:16   0  10G  0 disk /mnt
+vdc     252:32   0  10G  0 disk          &lt;- 追加されていることを確認
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              8/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>ボリュームのパーティション</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>ディスクのパーティションを行います。</li>
+</ul>
+<p>仮想マシンの操作:</p>
+<pre class="literal-block">
+--- ここから ---
+# fdisk /dev/vdc
+コマンド (m でヘルプ): n                &lt;- &quot;n&quot; を入力
+p
+パーティション番号 (1-4): 1             &lt;- &quot;1&quot; を入力
+最初 シリンダ (1-20805, 初期値 1):      &lt;- Enterを押下(デフォルト)
+Last シリンダ, +シリンダ数 or +size{K,M,G} (1-20805, 初期値 20805):   &lt;- Enterを押下(デフォルト)
+コマンド (m でヘルプ): p                &lt;- &quot;p&quot; を入力(設定確認)
+...（中略）...
+デバイス ブート 始点 終点 ブロック Id システム
+/dev/vdc1 1 20805 10485688+ 83 Linux
+...（中略）...
+コマンド (m でヘルプ): w                &lt;- &quot;w&quot; を入力(書き込み)
+
+# lsblk /dev/vdc
+NAME MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+vdc 252:32 0 10G 0 disk
+└─vdc1 252:33 0 10G 0 part           &lt;- パーティションが作成されていることを確認
+
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              9/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>ディスクのフォーマット</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>パーティションを作成できたら、ファイルシステムを作成して仮のマウントポイント/tmp/data にマウントします。</li>
+<li>ここではラベル &quot;mysql_data&quot; をつけています。</li>
+</ul>
+<p>仮想マシンの操作:</p>
+<pre class="literal-block">
+--- ここから ---
+ # mkfs.ext4 -L mysql_data /dev/vdc1
+ # tune2fs -c 0 -i 0 -r 0 /dev/vdc1
+ # mkdir /tmp/data
+ # mount LABEL=mysql_data /tmp/data
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              10/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>MySQL データの移行(1)</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>MySQLを停止してデータを移行します。まずは、仮のマウントポイントにマウントしデータを移動します。</li>
+</ul>
+<p>仮想マシンの操作:</p>
+<pre class="literal-block">
+--- ここから ---
+# chown -R mysql:mysql /tmp/data
+# service mysqld stop
+# mv /var/lib/mysql/* /tmp/data/
+# ls -lF /tmp/data/
+-rw-rw---- 1 mysql mysql 5242880 9月 3 16:01 2014 ib_logfile0
+-rw-rw---- 1 mysql mysql 5242880 8月 31 06:01 2014 ib_logfile1
+-rw-rw---- 1 mysql mysql 10485760 9月 3 16:01 2014 ibdata1
+drwx------ 2 mysql mysql 16384 8月 31 06:01 2014 lost+found/
+drwx------ 2 mysql mysql 4096 8月 31 06:01 2014 mysql/
+drwx------ 2 mysql mysql 4096 8月 31 06:06 2014 sample_bbs/
+drwx------ 2 mysql mysql 4096 8月 31 06:01 2014 test/
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              11/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>MySQL データの移行(2)</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>移動したデータでMySQLを起動します。データを移した/tmp/dataを一旦アンマウントしてから、MySQLのデータディレクトリにマウントし直します。</li>
+<li>MySQL再起動後、サンプルアプリケーションの再起動を行います。</li>
+</ul>
+<p>仮想マシンの操作:</p>
+<pre class="literal-block">
+--- ここから ---
+# umount /tmp/data/
+# mount LABEL=mysql_data /var/lib/mysql
+# df -h /var/lib/mysql
+Filesystem Size Used Avail Use% Mounted on
+/dev/vdc1 9.9G 172M 9.7G 2% /var/lib/mysql
+# service mysqld start
+# sh ~/sample-app/server-setup/rest.init.sh restart
+# exit
+--- ここまで ---
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              12/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>サンプルアプリケーションの動作確認</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>ブラウザからサンプルアプリケーションを操作し、書き込みができることを確認します。</li>
+</ul>
+<img alt="./_assets/c2-t3/02-end.png" src="data:image/png;base64,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" style="width: 85%;" /></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              13/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>後片付け</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>作業を完了する場合は、以下のコマンドを実行し、作成した仮想マシンとFloating-IPを全て削除してください。</li>
+<li>引き続きボリュームのスナップショット、バックアップを行う場合は片付けをせずに次に進んでください。</li>
+</ul>
+<p>コマンド実行の様子:</p>
+<pre class="literal-block">
+---- ここから ----
+# exit
+# pwd
+/opt/support/t3-c2  # &lt;---「/opt/support/t3-c2」にいることを確認します。
+# ./99_cleanup.sh
+---- ここまで ----
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              14/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t3-c2.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>まとめ</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>仮想マシンをボリュームにマウントし、MySQLのデータをエフェメラルディスク上からボリューム上に移行しました。</li>
+<li>ボリュームのスナップショット機能、バックアップ機能を利用したデータの保護を行うことができるようになります。</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t3-c2.rst">t3-c2.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              15/15
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+  
+  <div id="toc" class="sidebar hidden">
+    <h2>Table of Contents</h2>
+    <table>
+      <caption>Table of Contents</caption>
+      
+      <tr id="toc-row-1">
+        <th><a href="#slide1">ボリュームの作成と接続</a></th>
+        <td><a href="#slide1">1</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-2">
+        <th><a href="#slide2">概要</a></th>
+        <td><a href="#slide2">2</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-3">
+        <th><a href="#slide3">操作環境の準備</a></th>
+        <td><a href="#slide3">3</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-4">
+        <th><a href="#slide4">操作環境の確認(1)</a></th>
+        <td><a href="#slide4">4</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-5">
+        <th><a href="#slide5">操作環境の確認(2)</a></th>
+        <td><a href="#slide5">5</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-6">
+        <th><a href="#slide6">ボリュームの作成と接続</a></th>
+        <td><a href="#slide6">6</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-7">
+        <th><a href="#slide7">仮想マシンへのボリュームの接続</a></th>
+        <td><a href="#slide7">7</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-8">
+        <th><a href="#slide8">仮想マシンへのログイン</a></th>
+        <td><a href="#slide8">8</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-9">
+        <th><a href="#slide9">ボリュームのパーティション</a></th>
+        <td><a href="#slide9">9</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-10">
+        <th><a href="#slide10">ディスクのフォーマット</a></th>
+        <td><a href="#slide10">10</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-11">
+        <th><a href="#slide11">MySQL データの移行(1)</a></th>
+        <td><a href="#slide11">11</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-12">
+        <th><a href="#slide12">MySQL データの移行(2)</a></th>
+        <td><a href="#slide12">12</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-13">
+        <th><a href="#slide13">サンプルアプリケーションの動作確認</a></th>
+        <td><a href="#slide13">13</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-14">
+        <th><a href="#slide14">後片付け</a></th>
+        <td><a href="#slide14">14</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-15">
+        <th><a href="#slide15">まとめ</a></th>
+        <td><a href="#slide15">15</a></td>
+      </tr>
+      
+      
+    </table>
+  </div>
+  
+  <div id="help" class="sidebar hidden">
+    <h2>Help</h2>
+    <table>
+      <caption>Help</caption>
+      <tr>
+        <th>Table of Contents</th>
+        <td>t</td>
+      </tr>
+      <tr>
+        <th>Exposé</th>
+        <td>ESC</td>
+      </tr>
+      <tr>
+        <th>Full screen slides</th>
+        <td>e</td>
+      </tr>
+      <tr>
+        <th>Presenter View</th>
+        <td>p</td>
+      </tr>
+      <tr>
+        <th>Source Files</th>
+        <td>s</td>
+      </tr>
+      <tr>
+        <th>Slide Numbers</th>
+        <td>n</td>
+      </tr>
+      <tr>
+        <th>Toggle screen blanking</th>
+        <td>b</td>
+      </tr>
+      <tr>
+        <th>Show/hide slide context</th>
+        <td>c</td>
+      </tr>
+      <tr>
+        <th>Notes</th>
+        <td>2</td>
+      </tr>
+      <tr>
+        <th>Help</th>
+        <td>h</td>
+      </tr>
+    </table>
+  </div>
+  <script>main()</script>
+</body>
+</html>
