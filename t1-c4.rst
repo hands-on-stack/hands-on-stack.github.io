@@ -1,4 +1,4 @@
-仮想サーバーを1台起動してみる(CLI)
+簡単なサーバー自動構築にチャレンジしてみる
 ================
 
 ----
@@ -6,8 +6,8 @@
 概要
 ================
 
-- ここではOpenStack上にコマンドラインを利用して仮想サーバーを１台起動します。
-- ダッシュボードを利用した仮想サーバーの起動と比較するとわかりやすいと思います。
+- ここではOpenStack上にコマンドラインを利用してサンプルアプリケーションの自動構築にチャレンジしてみます。
+- サンプルアプリケーションはシンプルな掲示板アプリになります。
 
 ----
 
@@ -82,6 +82,7 @@
 ----
 
 
+
 操作環境へのログイン
 ================
 
@@ -99,6 +100,56 @@
 ----
 
 
+自動化の概要
+================
+
+- 自動化には *userdata* という仕組みを利用します。
+- これは、起動する仮想マシンに外部からスクリプトを送り込み実行させる仕組みです。
+- このスクリプトを外部に持つことで、何度でも同じ設定を持った仮想マシンを作成できるようになります。
+
+----
+
+
+userdata の作成
+================
+
+- 操作環境へ *studentXX* でログインし、以下のファイルを作成します。
+
+コマンドの実行::
+
+  ---------ここから---------
+  $ cd $HOME
+  $ vi userdata_t1-c4.txt
+  ---------ここまで---------
+
+ファイルの内容は事項参照
+
+----
+
+userdata の中身
+================
+
+userdata::
+
+  ---------ここから---------
+  #!/bin/bash
+  yum install -q -y git
+  cd /root
+  git clone -q https://github.com/josug-book1-materials/sample-app.git
+  cd sample-app
+  git checkout -b v1.0 remotes/origin/v1.0
+  sh /root/sample-app/server-setup/install_web.sh
+  sh /root/sample-app/server-setup/install_rest.sh
+  sh /root/sample-app/server-setup/install_db.sh
+  sh /root/sample-app/server-setup/web.init.sh start
+  sh /root/sample-app/server-setup/rest.init.sh start
+  yum install -q -y w3m
+  echo "##### Userdata script completed #####"
+  ---------ここまで---------
+
+----
+
+
 仮想サーバーの起動
 ================
 
@@ -112,8 +163,9 @@
 
   $ nova boot --flavor standard.xsmall --image "centos-base" \
   --key-name default --security-groups default \
+  --user-data userdata_t1-c4.txt \
   --availability-zone az1 \
-  --nic net-id=${MY_WORK_NET} studentXX-vm-from-cli
+  --nic net-id=${MY_WORK_NET} studentXX-vm-sample-app
   ---------ここまで---------
 
 *XX* の部分は、操作しているPCに割り当てられているノートPCの番号になります。
@@ -131,7 +183,7 @@
 
   ---------ここから---------
   $ nova list
-  $ watch -n 10 nova console-log --length 20 studentXX-vm-from-cli
+  $ watch -n 10 nova console-log --length 20 studentXX-vm-sample-app
   ---------ここまで---------
 
 *XX* の部分は、操作しているPCに割り当てられているノートPCの番号になります。
@@ -185,6 +237,32 @@
 ----
 
 
+アプリケーションの動作確認
+================
+
+- テキストブラウザを利用してアプリケーションの起動を確認してみます。
+
+コマンドの実行::
+
+  ---------ここから---------
+  $ w3m localhost
+  ---------ここまで---------
+
+- 無事、アクセスができたら、何か書き込みを行ってみましょう。
+
+実行例::
+
+  Please write something and hit enter [                    ]
+
+  2015-02-03 06:03:36  test2
+  2015-02-03 06:03:34  test
+
+- ブラウザを終了するには、 *q* キーを押下します。
+
+----
+
+
+
 後かたずけ
 ================
 
@@ -193,7 +271,8 @@
 コマンドの実行::
 
   ---------ここから---------
-  $ nova delete studentXX-vm-from-cli
+  $ rm userdata_t1-c4.txt
+  $ nova delete studentXX-vm-sample-app
   $ nova floating-ip-delete 118.67.96.YY
   ---------ここまで---------
 
@@ -226,10 +305,8 @@
 ポイントとまとめ
 ================
 
-- OpenStackではダッシュボードと同様の操作をコマンドラインから実施することができます。
+- OpenStackでは仮想マシン起動時に *userdata* というスクリプトを送り込むことで、環境の自動構成を行うことが可能です。
 
-  - 実際にはコマンドラインでできることの一部を、ダッシュボードから実行できる、というデザインです。
+- 今回作成した *userdata* を再利用することで、何度でも同じ設定のサーバーを構築することができます。
 
-- コマンドラインでの仮想マシン作成は、シェルスクリプト化することで簡単に自動化可能です。
-
-- 高度な活用方法については、演習のテーマ2を確認してみてください。
+- 更に高度な自動化を行うには、テーマ2を確認してみてください。

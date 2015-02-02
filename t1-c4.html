@@ -25,7 +25,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>仮想サーバーを1台起動してみる(CLI)</title>
+    <title>簡単なサーバー自動構築にチャレンジしてみる</title>
     <!-- Styles -->
     
     <style type="text/css" media="print">
@@ -1328,7 +1328,7 @@ aside {
         <div class="slide">
           <div class="inner">
             
-            <header><h1>仮想サーバーを1台起動してみる(CLI)</h1></header>
+            <header><h1>簡単なサーバー自動構築にチャレンジしてみる</h1></header>
             
             
           </div>
@@ -1345,7 +1345,7 @@ aside {
             </aside>
             
             <aside class="page_number">
-              1/15
+              1/19
             </aside>
           </footer>
         </div>
@@ -1360,8 +1360,8 @@ aside {
             
             
             <section><ul class="simple">
-<li>ここではOpenStack上にコマンドラインを利用して仮想サーバーを１台起動します。</li>
-<li>ダッシュボードを利用した仮想サーバーの起動と比較するとわかりやすいと思います。</li>
+<li>ここではOpenStack上にコマンドラインを利用してサンプルアプリケーションの自動構築にチャレンジしてみます。</li>
+<li>サンプルアプリケーションはシンプルな掲示板アプリになります。</li>
 </ul></section>
             
           </div>
@@ -1378,7 +1378,7 @@ aside {
             </aside>
             
             <aside class="page_number">
-              2/15
+              2/19
             </aside>
           </footer>
         </div>
@@ -1413,7 +1413,7 @@ aside {
             </aside>
             
             <aside class="page_number">
-              3/15
+              3/19
             </aside>
           </footer>
         </div>
@@ -1451,7 +1451,7 @@ $ check_id
             </aside>
             
             <aside class="page_number">
-              4/15
+              4/19
             </aside>
           </footer>
         </div>
@@ -1484,7 +1484,7 @@ $ check_id
             </aside>
             
             <aside class="page_number">
-              5/15
+              5/19
             </aside>
           </footer>
         </div>
@@ -1517,7 +1517,7 @@ $ check_id
             </aside>
             
             <aside class="page_number">
-              6/15
+              6/19
             </aside>
           </footer>
         </div>
@@ -1566,7 +1566,7 @@ $ check_id
             </aside>
             
             <aside class="page_number">
-              7/15
+              7/19
             </aside>
           </footer>
         </div>
@@ -1606,7 +1606,128 @@ $ ssh studentXX
             </aside>
             
             <aside class="page_number">
-              8/15
+              8/19
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t1-c4.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>自動化の概要</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>自動化には <em>userdata</em> という仕組みを利用します。</li>
+<li>これは、起動する仮想マシンに外部からスクリプトを送り込み実行させる仕組みです。</li>
+<li>このスクリプトを外部に持つことで、何度でも同じ設定を持った仮想マシンを作成できるようになります。</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t1-c4.rst">t1-c4.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              9/19
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t1-c4.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>userdata の作成</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>操作環境へ <em>studentXX</em> でログインし、以下のファイルを作成します。</li>
+</ul>
+<p>コマンドの実行:</p>
+<pre class="literal-block">
+---------ここから---------
+$ cd $HOME
+$ vi userdata_t1-c4.txt
+---------ここまで---------
+</pre>
+<p>ファイルの内容は事項参照</p></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t1-c4.rst">t1-c4.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              10/19
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t1-c4.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>userdata の中身</h1></header>
+            
+            
+            <section><p>userdata:</p>
+<pre class="literal-block">
+---------ここから---------
+#!/bin/bash
+yum install -q -y git
+cd /root
+git clone -q https://github.com/josug-book1-materials/sample-app.git
+cd sample-app
+git checkout -b v1.0 remotes/origin/v1.0
+sh /root/sample-app/server-setup/install_web.sh
+sh /root/sample-app/server-setup/install_rest.sh
+sh /root/sample-app/server-setup/install_db.sh
+sh /root/sample-app/server-setup/web.init.sh start
+sh /root/sample-app/server-setup/rest.init.sh start
+yum install -q -y w3m
+echo &quot;##### Userdata script completed #####&quot;
+---------ここまで---------
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t1-c4.rst">t1-c4.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              11/19
             </aside>
           </footer>
         </div>
@@ -1631,8 +1752,9 @@ $ export MY_WORK_NET=`neutron net-show work-net | get_uuid`
 
 $ nova boot --flavor standard.xsmall --image &quot;centos-base&quot; \
 --key-name default --security-groups default \
+--user-data userdata_t1-c4.txt \
 --availability-zone az1 \
---nic net-id=${MY_WORK_NET} studentXX-vm-from-cli
+--nic net-id=${MY_WORK_NET} studentXX-vm-sample-app
 ---------ここまで---------
 </pre>
 <p><em>XX</em> の部分は、操作しているPCに割り当てられているノートPCの番号になります。</p></section>
@@ -1651,7 +1773,7 @@ $ nova boot --flavor standard.xsmall --image &quot;centos-base&quot; \
             </aside>
             
             <aside class="page_number">
-              9/15
+              12/19
             </aside>
           </footer>
         </div>
@@ -1673,7 +1795,7 @@ $ nova boot --flavor standard.xsmall --image &quot;centos-base&quot; \
 <pre class="literal-block">
 ---------ここから---------
 $ nova list
-$ watch -n 10 nova console-log --length 20 studentXX-vm-from-cli
+$ watch -n 10 nova console-log --length 20 studentXX-vm-sample-app
 ---------ここまで---------
 </pre>
 <p><em>XX</em> の部分は、操作しているPCに割り当てられているノートPCの番号になります。</p>
@@ -1696,7 +1818,7 @@ $ watch -n 10 nova console-log --length 20 studentXX-vm-from-cli
             </aside>
             
             <aside class="page_number">
-              10/15
+              13/19
             </aside>
           </footer>
         </div>
@@ -1743,7 +1865,7 @@ $ nova floating-ip-associate studentXX-vm-from-cli 118.67.96.YY
             </aside>
             
             <aside class="page_number">
-              11/15
+              14/19
             </aside>
           </footer>
         </div>
@@ -1783,7 +1905,58 @@ $ ssh -i default.pem root&#64;118.67.96.YY
             </aside>
             
             <aside class="page_number">
-              12/15
+              15/19
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t1-c4.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>アプリケーションの動作確認</h1></header>
+            
+            
+            <section><ul class="simple">
+<li>テキストブラウザを利用してアプリケーションの起動を確認してみます。</li>
+</ul>
+<p>コマンドの実行:</p>
+<pre class="literal-block">
+---------ここから---------
+$ w3m localhost
+---------ここまで---------
+</pre>
+<ul class="simple">
+<li>無事、アクセスができたら、何か書き込みを行ってみましょう。</li>
+</ul>
+<p>実行例:</p>
+<pre class="literal-block">
+Please write something and hit enter [                    ]
+
+2015-02-03 06:03:36  test2
+2015-02-03 06:03:34  test
+</pre>
+<ul class="simple">
+<li>ブラウザを終了するには、 <em>q</em> キーを押下します。</li>
+</ul></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t1-c4.rst">t1-c4.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              16/19
             </aside>
           </footer>
         </div>
@@ -1803,7 +1976,8 @@ $ ssh -i default.pem root&#64;118.67.96.YY
 <p>コマンドの実行:</p>
 <pre class="literal-block">
 ---------ここから---------
-$ nova delete studentXX-vm-from-cli
+$ rm userdata_t1-c4.txt
+$ nova delete studentXX-vm-sample-app
 $ nova floating-ip-delete 118.67.96.YY
 ---------ここまで---------
 </pre></section>
@@ -1822,7 +1996,7 @@ $ nova floating-ip-delete 118.67.96.YY
             </aside>
             
             <aside class="page_number">
-              13/15
+              17/19
             </aside>
           </footer>
         </div>
@@ -1870,7 +2044,7 @@ $ nova floating-ip-list
             </aside>
             
             <aside class="page_number">
-              14/15
+              18/19
             </aside>
           </footer>
         </div>
@@ -1885,12 +2059,9 @@ $ nova floating-ip-list
             
             
             <section><ul class="simple">
-<li>OpenStackではダッシュボードと同様の操作をコマンドラインから実施することができます。<ul>
-<li>実際にはコマンドラインでできることの一部を、ダッシュボードから実行できる、というデザインです。</li>
-</ul>
-</li>
-<li>コマンドラインでの仮想マシン作成は、シェルスクリプト化することで簡単に自動化可能です。</li>
-<li>高度な活用方法については、演習のテーマ2を確認してみてください。</li>
+<li>OpenStackでは仮想マシン起動時に <em>userdata</em> というスクリプトを送り込むことで、環境の自動構成を行うことが可能です。</li>
+<li>今回作成した <em>userdata</em> を再利用することで、何度でも同じ設定のサーバーを構築することができます。</li>
+<li>更に高度な自動化を行うには、テーマ2を確認してみてください。</li>
 </ul></section>
             
           </div>
@@ -1907,7 +2078,7 @@ $ nova floating-ip-list
             </aside>
             
             <aside class="page_number">
-              15/15
+              19/19
             </aside>
           </footer>
         </div>
@@ -1922,7 +2093,7 @@ $ nova floating-ip-list
       <caption>Table of Contents</caption>
       
       <tr id="toc-row-1">
-        <th><a href="#slide1">仮想サーバーを1台起動してみる(CLI)</a></th>
+        <th><a href="#slide1">簡単なサーバー自動構築にチャレンジしてみる</a></th>
         <td><a href="#slide1">1</a></td>
       </tr>
       
@@ -1970,44 +2141,68 @@ $ nova floating-ip-list
       
       
       <tr id="toc-row-9">
-        <th><a href="#slide9">仮想サーバーの起動</a></th>
+        <th><a href="#slide9">自動化の概要</a></th>
         <td><a href="#slide9">9</a></td>
       </tr>
       
       
       <tr id="toc-row-10">
-        <th><a href="#slide10">仮想サーバーの起動状態の確認</a></th>
+        <th><a href="#slide10">userdata の作成</a></th>
         <td><a href="#slide10">10</a></td>
       </tr>
       
       
       <tr id="toc-row-11">
-        <th><a href="#slide11">稼働サーバーへのログイン</a></th>
+        <th><a href="#slide11">userdata の中身</a></th>
         <td><a href="#slide11">11</a></td>
       </tr>
       
       
       <tr id="toc-row-12">
-        <th><a href="#slide12">稼働サーバーへのログイン</a></th>
+        <th><a href="#slide12">仮想サーバーの起動</a></th>
         <td><a href="#slide12">12</a></td>
       </tr>
       
       
       <tr id="toc-row-13">
-        <th><a href="#slide13">後かたずけ</a></th>
+        <th><a href="#slide13">仮想サーバーの起動状態の確認</a></th>
         <td><a href="#slide13">13</a></td>
       </tr>
       
       
       <tr id="toc-row-14">
-        <th><a href="#slide14">後かたずけ</a></th>
+        <th><a href="#slide14">稼働サーバーへのログイン</a></th>
         <td><a href="#slide14">14</a></td>
       </tr>
       
       
       <tr id="toc-row-15">
-        <th><a href="#slide15">ポイントとまとめ</a></th>
+        <th><a href="#slide15">稼働サーバーへのログイン</a></th>
         <td><a href="#slide15">15</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-16">
+        <th><a href="#slide16">アプリケーションの動作確認</a></th>
+        <td><a href="#slide16">16</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-17">
+        <th><a href="#slide17">後かたずけ</a></th>
+        <td><a href="#slide17">17</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-18">
+        <th><a href="#slide18">後かたずけ</a></th>
+        <td><a href="#slide18">18</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-19">
+        <th><a href="#slide19">ポイントとまとめ</a></th>
+        <td><a href="#slide19">19</a></td>
       </tr>
       
       
