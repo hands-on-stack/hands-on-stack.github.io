@@ -52,11 +52,11 @@ OpenStackと連携して仮想マシンの管理を行う
   ...(中略)...
   Waiting for guest OS to be ready........
   Associating floating IP...
-  Associated floating IP: 118.67.96.82
+  Associated floating IP: <Floating IP>
 
   Use the following command to login student10-step-server
-  => ssh -i /home/student10/default.pem root@118.67.96.82
-  $ ssh -i /home/student10/default.pem root@118.67.96.82
+  => ssh -i ~/default.pem root@<Floating IP>
+  $ ssh -i ~/default.pem root@<Floating IP>
   ---------ここまで---------
 
 
