@@ -210,7 +210,7 @@ userdata::
   | 118.67.96.YY |           | -        | Ext-Net |
   +--------------+-----------+----------+---------+
 
-  $ nova floating-ip-associate studentXX-vm-from-cli 118.67.96.YY
+  $ nova floating-ip-associate studentXX-vm-sample-app 118.67.96.YY
   ---------ここまで---------
 
 *XX* の部分は、操作しているPCに割り当てられているノートPCの番号になります。
