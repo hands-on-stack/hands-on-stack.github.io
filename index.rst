@@ -7,6 +7,7 @@
 - 続くページのリンクから、体験してみたいテーマを選択してください！
 - 最後にアンケートがありますので、体験後に是非回答をお願いします。次回以降の参考とさせていただきます。
 
+  - `アンケート <https://docs.google.com/forms/d/13bzoJcSk8I80E70-52UPkfaEN5Ye4iLw1SMG1fPsLl0/viewform?usp=send_form>`_ (演習の最後にお願いします)
 
 ----
 
@@ -97,3 +98,10 @@
 ================
 
 - `エラーと対処まとめ <./error.html>`_
+
+----
+
+アンケート
+================
+
+- `アンケート <https://docs.google.com/forms/d/13bzoJcSk8I80E70-52UPkfaEN5Ye4iLw1SMG1fPsLl0/viewform?usp=send_form>`_ (演習の最後にお願いします)
