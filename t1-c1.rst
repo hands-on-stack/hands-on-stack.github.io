@@ -18,7 +18,7 @@
 - http://www.rdcloud.bi-rd.net/auth/login/
 - ログインIDの確認方法は次ページ参照
 
-.. image:: ./_assets/c1-t1/01_login.png
+.. image:: ./_assets/t1-c1/01_login.png
    :width: 40%
 
 ----
@@ -32,8 +32,7 @@
 スクリプトの実行::
 
   ---------ここから---------
-  cd $HOME
-  sh env_support/check_id.sh
+  $ check_id
   ---------ここまで---------
 
 ----
@@ -44,7 +43,7 @@
 
 - この画面では全体の概要を確認できます。
 
-.. image:: ./_assets/c1-t1/02_overview.png
+.. image:: ./_assets/t1-c1/02_overview.png
    :width: 100%
 
 ----
@@ -54,7 +53,7 @@
 
 - 「ネットワークの管理」→「ネットワークトポロジー」を選択します。
 
-.. image:: ./_assets/c1-t1/03_networks.png
+.. image:: ./_assets/t1-c1/03_networks.png
    :width: 80%
 
 ----
@@ -88,7 +87,7 @@
 - 仮想マシンを起動します。
 - 「コンピュートの管理」→ 「インスタンス」→「インスタンスの起動」を選択します。
 
-.. image:: ./_assets/c1-t1/04_instance_01.png
+.. image:: ./_assets/t1-c1/04_instance_01.png
    :width: 80%
 
 ----
@@ -98,7 +97,7 @@
 
 - 「詳細」にパラメータを指定します（事項参照）
 
-.. image:: ./_assets/c1-t1/04_instance_02.png
+.. image:: ./_assets/t1-c1/04_instance_02.png
    :width: 65%
 
 ----
@@ -106,10 +105,33 @@
 仮想マシンの起動
 ================
 
+- 指定パラメータ
+
+  - アベイラビリティゾーン： az1
+
+  - インスタンス名： student *XX* -server
+
+    - *XX* の部分は、操作しているノートPCの番号を入力してい下さい。
+
+  - フレーバー： standard.xsmall
+
+  - インスタンス数： 1
+
+  - インスタンスのブートソース： イメージから起動
+
+  - イメージ名： centos-base
+
+----
+
+
+
+仮想マシンの起動
+================
+
 - セキュリティグループとキーペアを指定します
 - 両方とも「default」を指定します。
 
-.. image:: ./_assets/c1-t1/04_instance_03.png
+.. image:: ./_assets/t1-c1/04_instance_03.png
    :width: 70%
 
 ----
@@ -121,7 +143,7 @@
 - 「work-net」を選択します。
 - ここまでの入力が終了したら、「起動」を選択します。
 
-.. image:: ./_assets/c1-t1/04_instance_04.png
+.. image:: ./_assets/t1-c1/04_instance_04.png
    :width: 70%
 
 ----
