@@ -73,7 +73,7 @@ Swiftの状態確認
   $ swift stat sample_bbs
   $ swift list -l sample_bbs
 
-- アップロードした画像が増えていることが確認できるはずです。
+- ファイルが増えていることが確認できるはずです。
 
 ----
 
