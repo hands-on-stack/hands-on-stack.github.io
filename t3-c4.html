@@ -1476,8 +1476,9 @@ $ ./01_init.sh
             
             
             <section><ul class="simple">
-<li>ボリュームのバックアップを作成します。作成中はボリュームの状態が「backing-up」となり、完了するまでボリューム操作ができません。数分待って、状態がavailableになってからボリューム操作を行ってください。</li>
+<li>ボリュームのバックアップを作成します。</li>
 </ul>
+<p>作成中はボリュームの状態が「backing-up」となり、完了するまでボリューム操作ができません。数分待って、状態がavailableになってからボリューム操作を行ってください。</p>
 <p>コマンドの実行:</p>
 <pre class="literal-block">
 --- ここから ---
@@ -1644,8 +1645,8 @@ volume_45dee040-cb87-4c38-be9b-1dca3aec25ce/20150202025933/az_az2_backup_0c6bfa7
             
             <section><ul class="simple">
 <li>リストア用のボリュームを作成します。バックアップしたボリュームと同サイズで作成してください。</li>
-<li>リストアにも数分かかります。cinder list コマンドで状態を確認し、「available」となってから次の操作に進んでください。</li>
 </ul>
+<p>リストアにも数分かかります。cinder list コマンドで状態を確認し、「available」となってから次の操作に進んでください。</p>
 <p>コマンド操作:</p>
 <pre class="literal-block">
 --- ここから ---

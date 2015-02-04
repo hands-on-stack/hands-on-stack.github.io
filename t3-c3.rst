@@ -24,12 +24,21 @@
   ---- ここから ----
   $ cd /opt/support/t3-c3
   $ ./01_init.sh
+  # Creating seurity-group :sg-for-web-student03
+  # Booting Server :t3-c2-student03
+  # Create Floating IP
+  # Associate Floating IP <Floating IP>
+  # t3-c3-student03 : <Floating IP>
+  (以下略)
   ---- ここまで ----
 
 ----
 
 スナップショット取得前のデータ登録
 ================
+
+- 画面からデータを追加します。
+URL: http://<Floating IP>
 
 .. image:: ./_assets/c3-t3/01-init.png
    :width: 75%
@@ -39,8 +48,7 @@
 DBの停止とアンマウント
 ================
 
-- スナップショットを取得する前に、MySQLを停止してファイルシステムをアンマウントすることに
-より、データの静止点を作ります。
+- スナップショットを取得する前に、MySQLを停止してファイルシステムをアンマウントすることにより、データの静止点を作ります。
 
 コマンドの実行::
 
@@ -130,7 +138,6 @@ DBの停止とアンマウント
 コマンドの実行::
 
   --- ここから ---
-  
   # source getuuid.sh
   # source vars.sh
   # export MY_VOL01_SNAP001=`cinder snapshot-show ${VOL01}-snap01|get_uuid` 
@@ -158,7 +165,6 @@ DBの停止とアンマウント
 コマンドの実行::
 
   --- ここから ---
-
   # nova volume-attach allinone-student03  <リストアボリュームのID>
   +----------+--------------------------------------+
   | Property | Value                                |
