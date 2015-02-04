@@ -2112,18 +2112,14 @@ crudini --set /root/sample-app/endpoint.conf \
 </ul>
 <p>コマンド実行の様子:</p>
 <pre class="literal-block">
-[root&#64;step-server ~]# logout
-Connection to 118.67.96.82 closed.
-$ cd /opt/support/t2-c1
-$ pwd
-/opt/support/t2-c1 &lt;---「/opt/support/t2-c1」にいることを確認します。
-$ ./9_cleanup.sh
-### delete wed01
-### delete app01
+$ /opt/support/common/9_cleanup.sh
+### delete all instances
+# delete instance: 43a929db-44ca-4754-a8bb-bd3c1981affa
+# delete instance: 0b602aaf-5a18-4441-9876-c21300e1ff2d
 ...
-==================================================
-Cleanup completed!
-==================================================
+### delete all FIPs
+# delete FIP: 118.67.96.118
+########## completed !!
 </pre></section>
             
           </div>
