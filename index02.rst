@@ -6,4 +6,4 @@
 
   - `三階層システムの自動構築にチャレンジ <./t2-c1.html>`_
   - `Ansibleによる自動化                  <./t2-c2.html>`_
-  - `Serfによる自律システム構築           <./t2-c3.html>`_ Commig Soon!
+  - `Serfによる自律システム構築           <./t2-c3.html>`_
