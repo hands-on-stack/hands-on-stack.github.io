@@ -60,6 +60,7 @@
 ================
 
 - ブラウザからサンプルアプリケーションを開き、データを登録します。
+URL : http://<Floating IP>
 
 .. image:: ./_assets/c2-t3/01-init.png
    :width: 85%
