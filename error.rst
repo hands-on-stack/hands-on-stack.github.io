@@ -27,3 +27,21 @@ ssh 接続時のエラー
 
   $ rm ~/.ssh/known_hosts
 
+----
+
+console-log 確認時の注意
+================
+
+演習の中でwatchコマンドでコンソールログを確認することがあります。この時、開いているウィンドウが短いとログインプロンプトが表示しきれない場合がありますので、待ち時間が長いと感じたらコンソールを縦に伸ばしてみるか、以下のようにwatchコマンドなしでコンソールログを確認してみてください。
+
+例）::
+
+ ---------ここから---------
+ # watch あり
+ $ watch -n 10 nova console-log --length 20 studentXX-vm-from-clii
+ 
+ # watch なし
+ $ nova console-log --length 20 studentXX-vm-from-cli
+ ---------ここまで---------
+
+

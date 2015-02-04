@@ -1345,7 +1345,7 @@ aside {
             </aside>
             
             <aside class="page_number">
-              1/2
+              1/3
             </aside>
           </footer>
         </div>
@@ -1395,7 +1395,47 @@ $ rm ~/.ssh/known_hosts
             </aside>
             
             <aside class="page_number">
-              2/2
+              2/3
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: error.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>console-log 確認時の注意</h1></header>
+            
+            
+            <section><p>演習の中でwatchコマンドでコンソールログを確認することがあります。この時、開いているウィンドウが短いとログインプロンプトが表示しきれない場合がありますので、待ち時間が長いと感じたらコンソールを縦に伸ばしてみるか、以下のようにwatchコマンドなしでコンソールログを確認してみてください。</p>
+<p>例）:</p>
+<pre class="literal-block">
+---------ここから---------
+# watch あり
+$ watch -n 10 nova console-log --length 20 studentXX-vm-from-clii
+
+# watch なし
+$ nova console-log --length 20 studentXX-vm-from-cli
+---------ここまで---------
+</pre></section>
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="error.rst">error.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              3/3
             </aside>
           </footer>
         </div>
@@ -1418,6 +1458,12 @@ $ rm ~/.ssh/known_hosts
       <tr id="toc-row-2">
         <th><a href="#slide2">ssh 接続時のエラー</a></th>
         <td><a href="#slide2">2</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-3">
+        <th><a href="#slide3">console-log 確認時の注意</a></th>
+        <td><a href="#slide3">3</a></td>
       </tr>
       
       
