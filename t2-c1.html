@@ -1345,7 +1345,7 @@ aside {
             </aside>
             
             <aside class="page_number">
-              1/19
+              1/20
             </aside>
           </footer>
         </div>
@@ -1381,7 +1381,7 @@ aside {
             </aside>
             
             <aside class="page_number">
-              2/19
+              2/20
             </aside>
           </footer>
         </div>
@@ -1428,7 +1428,7 @@ Initialization Completed!
             </aside>
             
             <aside class="page_number">
-              3/19
+              3/20
             </aside>
           </footer>
         </div>
@@ -1474,7 +1474,7 @@ echo &quot;### end userdata_dbs&quot;
             </aside>
             
             <aside class="page_number">
-              4/19
+              4/20
             </aside>
           </footer>
         </div>
@@ -1522,7 +1522,7 @@ $ nova boot --flavor standard.xsmall --image &quot;centos-base&quot; \
             </aside>
             
             <aside class="page_number">
-              5/19
+              5/20
             </aside>
           </footer>
         </div>
@@ -1568,7 +1568,7 @@ dbs01 login:
             </aside>
             
             <aside class="page_number">
-              6/19
+              6/20
             </aside>
           </footer>
         </div>
@@ -1619,7 +1619,7 @@ sh /root/sample-app/server-setup/rest.init.sh start
             </aside>
             
             <aside class="page_number">
-              7/19
+              7/20
             </aside>
           </footer>
         </div>
@@ -1669,7 +1669,7 @@ $ nova boot --flavor standard.xsmall --image &quot;centos-base&quot; \
             </aside>
             
             <aside class="page_number">
-              8/19
+              8/20
             </aside>
           </footer>
         </div>
@@ -1720,7 +1720,7 @@ sh /root/sample-app/server-setup/web.init.sh start
             </aside>
             
             <aside class="page_number">
-              9/19
+              9/20
             </aside>
           </footer>
         </div>
@@ -1767,7 +1767,7 @@ $ nova boot \
             </aside>
             
             <aside class="page_number">
-              10/19
+              10/20
             </aside>
           </footer>
         </div>
@@ -1814,7 +1814,7 @@ $ nova floating-ip-associate web01 118.67.96.85
             </aside>
             
             <aside class="page_number">
-              11/19
+              11/20
             </aside>
           </footer>
         </div>
@@ -1850,7 +1850,7 @@ $ nova floating-ip-associate web01 118.67.96.85
             </aside>
             
             <aside class="page_number">
-              12/19
+              12/20
             </aside>
           </footer>
         </div>
@@ -1900,7 +1900,7 @@ $ nova list --fields name,networks
             </aside>
             
             <aside class="page_number">
-              13/19
+              13/20
             </aside>
           </footer>
         </div>
@@ -1945,7 +1945,7 @@ $ ssh -i default.pem root&#64;118.67.96.82
             </aside>
             
             <aside class="page_number">
-              14/19
+              14/20
             </aside>
           </footer>
         </div>
@@ -1996,7 +1996,7 @@ sh /root/sample-app/server-setup/web.init.sh start
             </aside>
             
             <aside class="page_number">
-              15/19
+              15/20
             </aside>
           </footer>
         </div>
@@ -2045,7 +2045,7 @@ sh /root/sample-app/server-setup/web.init.sh start
             </aside>
             
             <aside class="page_number">
-              16/19
+              16/20
             </aside>
           </footer>
         </div>
@@ -2092,7 +2092,7 @@ crudini --set /root/sample-app/endpoint.conf \
             </aside>
             
             <aside class="page_number">
-              17/19
+              17/20
             </aside>
           </footer>
         </div>
@@ -2112,18 +2112,14 @@ crudini --set /root/sample-app/endpoint.conf \
 </ul>
 <p>コマンド実行の様子:</p>
 <pre class="literal-block">
-[root&#64;step-server ~]# logout
-Connection to 118.67.96.82 closed.
-$ cd /opt/support/t2-c1
-$ pwd
-/opt/support/t2-c1 &lt;---「/opt/support/t2-c1」にいることを確認します。
-$ ./9_cleanup.sh
-### delete wed01
-### delete app01
+$ /opt/support/common/9_cleanup.sh
+### delete all instances
+# delete instance: 43a929db-44ca-4754-a8bb-bd3c1981affa
+# delete instance: 0b602aaf-5a18-4441-9876-c21300e1ff2d
 ...
-==================================================
-Cleanup completed!
-==================================================
+### delete all FIPs
+# delete FIP: 118.67.96.118
+########## completed !!
 </pre></section>
             
           </div>
@@ -2140,7 +2136,7 @@ Cleanup completed!
             </aside>
             
             <aside class="page_number">
-              18/19
+              18/20
             </aside>
           </footer>
         </div>
@@ -2179,7 +2175,35 @@ userdata/metadata という OpenStack にデータを渡す仕組みを活用し
             </aside>
             
             <aside class="page_number">
-              19/19
+              19/20
+            </aside>
+          </footer>
+        </div>
+      </div>
+      
+      <!-- slide source: t2-c1.rst -->
+      <div class="slide-wrapper">
+        <div class="slide">
+          <div class="inner">
+            
+            <header><h1>おつかれさまでした</h1></header>
+            
+            
+          </div>
+          <div class="presenter_notes">
+            <header><h1>Presenter Notes</h1></header>
+            <section>
+            
+            </section>
+          </div>
+          <footer>
+            
+            <aside class="source">
+              Source: <a href="t2-c1.rst">t2-c1.rst</a>
+            </aside>
+            
+            <aside class="page_number">
+              20/20
             </aside>
           </footer>
         </div>
@@ -2304,6 +2328,12 @@ userdata/metadata という OpenStack にデータを渡す仕組みを活用し
       <tr id="toc-row-19">
         <th><a href="#slide19">ポイントとまとめ</a></th>
         <td><a href="#slide19">19</a></td>
+      </tr>
+      
+      
+      <tr id="toc-row-20">
+        <th><a href="#slide20">おつかれさまでした</a></th>
+        <td><a href="#slide20">20</a></td>
       </tr>
       
       
